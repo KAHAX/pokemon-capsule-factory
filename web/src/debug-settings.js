@@ -1,5 +1,5 @@
 const KEY = 'capsule-display-settings-v1';
-export const defaults = Object.freeze({ goldChance: 10, parallaxDepth: 1, modelScale: 1, sceneToon: true, sceneOutline: true });
+export const defaults = Object.freeze({ goldChance: 10, parallaxDepth: 1, modelScale: 1, sceneOutline: true });
 const limits = { goldChance: [0, 100], parallaxDepth: [0, 2], modelScale: [.5, 1.35] };
 export function normalizeSettings(values = {}) {
   return Object.fromEntries(Object.entries(defaults).map(([key, fallback]) => {

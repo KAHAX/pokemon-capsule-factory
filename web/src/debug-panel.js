@@ -16,9 +16,8 @@ export function installDebugPanel() {
     <input id="debug-size" type="range" min="0.5" max="1.35" step="0.01" data-setting="modelScale">
     <p>卡牌参数即时生效。0 倍视差关闭空间偏移；较大的模型可能超出画框。</p>
     <div class="debug-render-heading">场景画风 <small>SCENE STYLE</small></div>
-    <label class="debug-toggle" for="debug-toon"><span>三渲二 · 漫画明暗</span><input id="debug-toon" type="checkbox" role="switch" data-setting="sceneToon"></label>
     <label class="debug-toggle" for="debug-outline"><span>深灰色描边</span><input id="debug-outline" type="checkbox" role="switch" data-setting="sceneOutline"></label>
-    <p>独立开关，即时生效；两项关闭恢复原场景渲染。</p>
+    <p>描边独立开关，即时生效；保留原有材质的连续明暗。</p>
     <button type="button" id="debug-reset">恢复默认参数</button>`;
   document.body.appendChild(panel);
   const sync = () => {

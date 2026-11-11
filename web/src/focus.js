@@ -58,6 +58,12 @@ export class PokemonLibrary {
     const materials = new Map();
     source.traverse((object) => {
       if (!object.isMesh) return;
+      // Warm-up renders cache SkinnedMesh bounds in the bind pose. Small facial
+      // meshes (e.g. Ekans' eyes) then move far outside those bounds in idle poses
+      // and disappear when zooming/rotating. The observation/card viewer only
+      // shows one character: keep its animated parts drawn without per-frame
+      // CPU skinning to rebuild bounds. Factory/background culling is unchanged.
+      if (object.isSkinnedMesh) object.frustumCulled = false;
       const cloneMaterial = (material) => {
         if (!materials.has(material)) materials.set(material, cloneStyledMaterial(material));
         return materials.get(material);
