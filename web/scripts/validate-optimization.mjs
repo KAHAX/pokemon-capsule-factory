@@ -9,6 +9,7 @@ const beforeRoot='D:/Codex/2026-11-11/high-quality-validation/web/public/assets/
 const report=JSON.parse(await fs.readFile('../optimization-report.json','utf8'));
 const arr=a=>Array.from(a);
 for(const row of report){
+ if(row.file==='scene-v5-additions') {console.log('scene-v5-additions: intentional background removal; use check-background-removal.mjs against pre-removal model');continue;}
  const a=await io.read(beforeRoot+row.file+'.glb'),b=await io.read('public/assets/'+row.file+'.glb');
  const rig=d=>d.getRoot().listNodes().map(n=>[n.getName(),n.getTranslation(),n.getRotation(),n.getScale(),n.getMesh()?.getName()]);
  const ra=rig(a),rb=rig(b); assert.equal(ra.length,rb.length);

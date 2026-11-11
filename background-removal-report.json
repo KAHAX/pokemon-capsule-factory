@@ -1,0 +1,797 @@
+{
+  "before": {
+    "triangles": 2422855,
+    "meshes": 162,
+    "textures": 17,
+    "textureBytes": 8752441
+  },
+  "after": {
+    "triangles": 846904,
+    "meshes": 60,
+    "textures": 8,
+    "textureBytes": 7863436
+  },
+  "bytes": 19441988,
+  "removed": [
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_004",
+      "before": 2002,
+      "after": 0,
+      "removedComponents": 3
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_005",
+      "before": 3780,
+      "after": 0,
+      "removedComponents": 21
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_006",
+      "before": 1334,
+      "after": 0,
+      "removedComponents": 5
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_007",
+      "before": 3078,
+      "after": 0,
+      "removedComponents": 33
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_008",
+      "before": 324,
+      "after": 0,
+      "removedComponents": 3
+    },
+    {
+      "name": "V5_STATIC / V2 · Slanted sign insert",
+      "before": 188,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / V2 · Slanted acrylic sign",
+      "before": 188,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_010",
+      "before": 438,
+      "after": 0,
+      "removedComponents": 5
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_011",
+      "before": 8590,
+      "after": 0,
+      "removedComponents": 92
+    },
+    {
+      "name": "V5_STATIC / V2 · Pixel lettering SUPER GAMEBOY",
+      "before": 406,
+      "after": 0,
+      "removedComponents": 203
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_013",
+      "before": 3558,
+      "after": 0,
+      "removedComponents": 11
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_015",
+      "before": 868,
+      "after": 0,
+      "removedComponents": 10
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_016",
+      "before": 650,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_017",
+      "before": 2631,
+      "after": 0,
+      "removedComponents": 18
+    },
+    {
+      "name": "V5_STATIC / V2 · Console deep top deck",
+      "before": 2110,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / V2 · Clear triangular end.001",
+      "before": 140,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / V2 · Clear triangular end",
+      "before": 140,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / SCREEN · 黄色背光与滚动灰阶像素",
+      "before": 3072,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_014",
+      "before": 240,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / Rear service marking",
+      "before": 4942,
+      "after": 0,
+      "removedComponents": 18
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_023",
+      "before": 64492,
+      "after": 55492,
+      "removedComponents": 6
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_024",
+      "before": 21924,
+      "after": 21624,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_026",
+      "before": 90964,
+      "after": 88868,
+      "removedComponents": 8
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_027",
+      "before": 3092,
+      "after": 252,
+      "removedComponents": 8
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_028",
+      "before": 980,
+      "after": 216,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_029",
+      "before": 34104,
+      "after": 21740,
+      "removedComponents": 9
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_031",
+      "before": 53200,
+      "after": 42308,
+      "removedComponents": 13
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_033",
+      "before": 73228,
+      "after": 69912,
+      "removedComponents": 7
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_034",
+      "before": 6912,
+      "after": 5544,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_046",
+      "before": 51938,
+      "after": 7452,
+      "removedComponents": 132
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_047",
+      "before": 17764,
+      "after": 3376,
+      "removedComponents": 42
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_048",
+      "before": 5108,
+      "after": 586,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_049",
+      "before": 40282,
+      "after": 1962,
+      "removedComponents": 74
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_050",
+      "before": 10164,
+      "after": 3366,
+      "removedComponents": 48
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_051",
+      "before": 2758,
+      "after": 2570,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_052",
+      "before": 28292,
+      "after": 6568,
+      "removedComponents": 152
+    },
+    {
+      "name": "V5_STATIC / Rear left control cabinet",
+      "before": 300,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / Rear diagnostic screen",
+      "before": 300,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_055",
+      "before": 1108,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_061",
+      "before": 14700,
+      "after": 14558,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_067",
+      "before": 8700,
+      "after": 292,
+      "removedComponents": 56
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_068",
+      "before": 4420,
+      "after": 0,
+      "removedComponents": 12
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_069",
+      "before": 3762,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_070",
+      "before": 4850,
+      "after": 0,
+      "removedComponents": 31
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_071",
+      "before": 46606,
+      "after": 0,
+      "removedComponents": 50
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_072",
+      "before": 9134,
+      "after": 0,
+      "removedComponents": 28
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_073",
+      "before": 31192,
+      "after": 0,
+      "removedComponents": 94
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_074",
+      "before": 2526,
+      "after": 0,
+      "removedComponents": 12
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_075",
+      "before": 1320,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / GIF 03 / yellow pressure bottle",
+      "before": 740,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_077",
+      "before": 450,
+      "after": 0,
+      "removedComponents": 3
+    },
+    {
+      "name": "V5_STATIC / GIF 01 / ivory tower",
+      "before": 662,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_079",
+      "before": 5004,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_079",
+      "before": 1628,
+      "after": 0,
+      "removedComponents": 12
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_079",
+      "before": 2728,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_079",
+      "before": 824,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_080",
+      "before": 6400,
+      "after": 0,
+      "removedComponents": 8
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_080",
+      "before": 4136,
+      "after": 0,
+      "removedComponents": 20
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_080",
+      "before": 2688,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_080",
+      "before": 512,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_080",
+      "before": 3440,
+      "after": 0,
+      "removedComponents": 16
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_081",
+      "before": 2820,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / GIF / segmented return belt tread",
+      "before": 4944,
+      "after": 276,
+      "removedComponents": 389
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_083",
+      "before": 9128,
+      "after": 0,
+      "removedComponents": 33
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_084",
+      "before": 15890,
+      "after": 0,
+      "removedComponents": 38
+    },
+    {
+      "name": "V5_STATIC / SUPPLY · Pokemon wordmark",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / SUPPLY · Orbital transfer symbol",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / SEAL · Link emblem",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / SCAN · Speed calibration symbol",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / OUTPUT · Destination badge",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / POKEMON · Pikachu decal",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / POKEMON · Eevee decal",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / POKEMON · Snorlax decal",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_085",
+      "before": 257496,
+      "after": 0,
+      "removedComponents": 330
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_086",
+      "before": 13032,
+      "after": 6536,
+      "removedComponents": 8
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_087",
+      "before": 632,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / BENCH · Tool rail",
+      "before": 188,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_089",
+      "before": 6586,
+      "after": 0,
+      "removedComponents": 15
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_090",
+      "before": 82898,
+      "after": 0,
+      "removedComponents": 184
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_091",
+      "before": 1800,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_092",
+      "before": 4040,
+      "after": 0,
+      "removedComponents": 9
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_094",
+      "before": 6312,
+      "after": 0,
+      "removedComponents": 6
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_095",
+      "before": 255864,
+      "after": 0,
+      "removedComponents": 48
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_096",
+      "before": 247464,
+      "after": 0,
+      "removedComponents": 48
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_093",
+      "before": 7740,
+      "after": 0,
+      "removedComponents": 9
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_097",
+      "before": 2814,
+      "after": 0,
+      "removedComponents": 6
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_098",
+      "before": 1332,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_101",
+      "before": 1688,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_099",
+      "before": 3840,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_100",
+      "before": 17108,
+      "after": 2204,
+      "removedComponents": 44
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_102",
+      "before": 3348,
+      "after": 0,
+      "removedComponents": 6
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_103",
+      "before": 15640,
+      "after": 0,
+      "removedComponents": 12
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_104",
+      "before": 80062,
+      "after": 0,
+      "removedComponents": 28
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_105",
+      "before": 15352,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_106",
+      "before": 5748,
+      "after": 0,
+      "removedComponents": 6
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_107",
+      "before": 16628,
+      "after": 0,
+      "removedComponents": 6
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_108",
+      "before": 192,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_109",
+      "before": 3836,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_110",
+      "before": 15352,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_111",
+      "before": 19180,
+      "after": 0,
+      "removedComponents": 10
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_112",
+      "before": 3196,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_background_113",
+      "before": 30704,
+      "after": 0,
+      "removedComponents": 8
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_114",
+      "before": 3196,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_115",
+      "before": 1916,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_116",
+      "before": 30816,
+      "after": 0,
+      "removedComponents": 12
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_117",
+      "before": 15352,
+      "after": 0,
+      "removedComponents": 4
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_118",
+      "before": 17268,
+      "after": 0,
+      "removedComponents": 6
+    },
+    {
+      "name": "V5_STATIC / WEB_STATIC_hero_119",
+      "before": 7676,
+      "after": 0,
+      "removedComponents": 2
+    },
+    {
+      "name": "V5_STATIC / VAT V2 · Squirtle curved hatch graphic",
+      "before": 128,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / DEEPEN · Eevee",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / INFUSER V2 · Large Pokemon wordmark",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / DEEPEN · Gengar",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / DEEPEN · Pikachu.002",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / PIPE V3 · Filter function icon",
+      "before": 128,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / PIPE V3 · Filter function icon.001",
+      "before": 128,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ART V3 · Supply title",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ART V3 · Energy lab title",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ART V3 · Sealer title",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ART V3 · Curved recovery artwork",
+      "before": 128,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ART V3 · Infuser energy orbit",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ART V3 · Sealer exchange graphic",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ART V3 · Rear service map",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ICON HANG · Link station supplied illustration",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ICON HANG · Link station supplied illustration.001",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ICON HANG · Orbit energy supplied illustration",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ICON HANG · Orbit energy supplied illustration.001",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ICON HANG · Fast transfer supplied illustration",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ICON HANG · Fast transfer supplied illustration.001",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ICON HANG · Pokemon destination supplied illustration",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    },
+    {
+      "name": "V5_STATIC / ICON HANG · Pokemon destination supplied illustration.001",
+      "before": 2,
+      "after": 0,
+      "removedComponents": 1
+    }
+  ]
+}

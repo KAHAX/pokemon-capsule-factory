@@ -1,4 +1,5 @@
 import { mobilePerformance } from './mobile-performance.js';
+import { extendConveyor } from './extended-conveyor.js';
 import { batchChamberBalls } from './chamber-batching.js';
 import { installNextPokemonPanel } from './next-pokemon-panel.js';
 import './style.css';
@@ -229,6 +230,7 @@ async function initialize() {
     onOutputReady: () => toast('精灵球已滚入出口托盘'),
     onOutputCollected: () => {},
   });
+  extendConveyor(scene, machine);
   boxInteraction = new BoxInteraction(scene, boxAsset);
   await yieldLoadingFrame();
   refineSceneMaterials(scene, renderer);

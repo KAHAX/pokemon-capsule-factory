@@ -36,3 +36,15 @@ User authorized mobile smoothness over fine raster detail, keeping the lighting 
 - Mobile observation, card and Pokédex renderers cap pixel ratio at 1.0; HTML text remains at native browser resolution.
 
 Validation: `node scripts/check-mobile-performance.mjs` checks device detection, adaptation bounds, warmup, slow-device response and recovery hysteresis; production build passes. Desktop Chrome touch emulation loaded the scene at 412×915 with a 370×823 main framebuffer, no context loss or shader failures. This verifies the mobile code path, not Huawei frame rate.
+
+## Remove rear devices and extend conveyor — 2026-11-12
+
+User requested removing background machinery while retaining Pokémon, main-machine interactions and feed tube. Preserved source at commit `fb96057`; a separate pre-removal additions asset is also stored locally outside the web root.
+
+- Remove complete connected pieces from the merged additions asset. Retain hero glass, main sign, cabinet, tile plinth, artwork and existing straight conveyor. Remaining texture image bytes are unchanged. No clipping plane or runtime hiding of downloaded machinery.
+- Add conveyor continuation to x=180 on the right; also cover the old left endpoint to x=-180. Reuse original nearby slat geometry and dark/light materials. Distant repeats use low-cost box geometry in spatial instance batches. The added continuation contains 78,192 triangles in total, with off-screen batches culled.
+- Relocate four Magnemite repair stations onto retained conveyor fittings and move Emolga's rest point to the main sign, avoiding invisible removed support objects. Other Pokémon meshes and behaviors unchanged.
+- Additions asset: 2,422,855 → 846,904 triangles; 162 → 60 mesh objects. Core packed model downloads: 48,598,947 → 28,275,560 bytes (41.8% less). This excludes later Pokémon, audio and other textures.
+- Controlled 1600×1000 desktop browser snapshots with all companions loaded and forced shadow refresh: six main-render samples averaged about 13.38M → 9.11M submitted triangles/frame (31.9% less), 4,412 → 4,087 draw calls (7.4% less). Reflections alternate update frames; averages include both. These are rendering workload counts, not a Huawei FPS benchmark. The final check also removes the orphan cabinet cover.
+
+Validation: build passes; `check-background-removal.mjs` verifies original retained texture pixels/transforms, nine protected hero meshes and valid indices/finite attributes. Browser reports no shader/runtime errors; output ball produced successfully; maximum zoom-out and both permitted horizontal orbit endpoints show continuous tracks beyond the viewport.

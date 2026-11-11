@@ -22,4 +22,13 @@ for(const file of new Set(files)) {
  manifest['/assets/'+file]={size:b.length,parts};raw+=b.length;
 }
 await fs.writeFile('src/transfer-manifest.json',JSON.stringify(manifest));
+// Remove only generated chunks no longer referenced by this manifest.
+const used=new Set(Object.values(manifest).flatMap(entry=>entry.parts.map(part=>path.basename(part.url))));
+const absoluteDir=path.resolve(dir);
+for(const name of await fs.readdir(absoluteDir)) {
+ if(!/^[a-f0-9]{24}\.bin$/.test(name)||used.has(name))continue;
+ const target=path.resolve(absoluteDir,name);
+ if(path.dirname(target)!==absoluteDir)throw Error('Unexpected transfer path');
+ await fs.unlink(target);
+}
 console.log(JSON.stringify({files:Object.keys(manifest).length,raw,packed,byteExact:true}));

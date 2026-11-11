@@ -201,9 +201,9 @@ export class BackgroundCompanions {
     });
     // Separate repair stations; the additional technicians work on existing terminals.
     const stations = [
-      { position: [-7.3, 3.85, -4.2], circuit: [-6.165, 3.65, -4.65], normal: [-1, 0, 0], size: 1.45, panel: 1, yaw: .2, hand: 'left_hand', offset: 0 },
-      { position: [-19.85, 4.05, -17.1], circuit: [-20.985, 3.85, -17.65], normal: [1, 0, 0], size: 1.85, panel: 1.4, yaw: -.22, hand: 'right_hand', offset: 4.1 },
-      { position: [-26.2, 4.65, -8.5], circuit: [-27.55, 3.94, -8.65], normal: [1, 0, 0], size: 1.85, panel: 0, yaw: -.3, hand: 'right_hand', offset: 7.3 },
+      { position: [-8.4, 3.1, -1.05], circuit: [-9.6, 2.15, -2.24], normal: [0, 0, 1], size: 1.45, panel: 1, yaw: .2, hand: 'left_hand', offset: 0 },
+      { position: [-20.1, 3.15, -1.05], circuit: [-19.2, 2.15, -2.24], normal: [0, 0, 1], size: 1.85, panel: 1, yaw: -.22, hand: 'right_hand', offset: 4.1 },
+      { position: [15.3, 3.15, -1.05], circuit: [14.4, 2.15, -2.24], normal: [0, 0, 1], size: 1.85, panel: 1, yaw: -.3, hand: 'right_hand', offset: 7.3 },
       { position: [7.25, 3.3, -1.85], circuit: [5.14, 2.3, -3.18], normal: [1, 0, 0], size: 1.45, panel: 0, yaw: -.45, hand: 'right_hand', offset: 2.2 },
     ];
     for (const [i, config] of stations.entries()) {
@@ -226,7 +226,7 @@ export class BackgroundCompanions {
     this.flyer.update(0);
     this.flyer.root.updateMatrixWorld(true);
     const standingBox = new THREE.Box3().setFromObject(this.flyer.root, true);
-    this.perch = v(-31.4, 14.34535121 - standingBox.min.y + .012, -26.8);
+    this.perch = v(-4.7, 14.14 - standingBox.min.y + .012, -3.35);
     this.flightCurve = new THREE.CatmullRomCurve3([
       this.perch.clone(), this.perch.clone().add(v(4, 2, 1)),
       v(-22, 15.4, -21), v(-12, 12.2, -13), v(3, 11.8, -10),
