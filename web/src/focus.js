@@ -128,7 +128,7 @@ export class FocusExperience {
     this.raycaster = new THREE.Raycaster();
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, stencil: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, stencil: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 800 ? 1.2 : 1.75));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -829,7 +829,7 @@ export class FocusExperience {
   storeCard() {
     if (this.mode !== 'card' || !this.card || !this.pokemonEntry) return;
     this.mode = 'card-returning';
-    this.record.uid ||= globalThis.crypto.randomUUID();
+    this.record.uid ||= (globalThis.crypto?.randomUUID?.() || `ball-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     const key = this.record.cardKey ||= `capsule-${this.record.uid}`;
     if (!this.store.cards.some(card => card.key === key)) this.store.add({
       key, sourceUid: this.record.uid,

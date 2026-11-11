@@ -59,7 +59,7 @@ export class ReshiramCompanion {
       const c = new THREE.CatmullRomCurve3(points, false, 'centripetal');
       c.arcLengthDivisions = 300; c.updateArcLengths(); return c;
     };
-    const skyEnd = p(layout.sky.at(-1));
+    const skyEnd = p(layout.sky[layout.sky.length - 1]);
     this.paths = {
       outward: curve([a, ...layout.outward.map(p), b]),
       home: curve([b, ...layout.home.map(p), a]),

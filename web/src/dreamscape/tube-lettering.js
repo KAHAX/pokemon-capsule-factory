@@ -21,7 +21,7 @@ export function bindTubePrintCoordinates(mesh, route) {
   const tangent = new THREE.Vector3(), across = new THREE.Vector3();
   mesh.updateWorldMatrix(true, false);
   const normalMatrix = new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld);
-  const start = points[0].s, span = points.at(-1).s - start;
+  const start = points[0].s, span = points[points.length - 1].s - start;
   for (let i = 0; i < positions.count; i++) {
     p.fromBufferAttribute(positions, i).applyMatrix4(mesh.matrixWorld);
     let nearest, fraction = 0, minimum = Infinity;
@@ -48,7 +48,7 @@ export function bindTubePrintCoordinates(mesh, route) {
 
 export function createTubeLettering(route) {
   const start = route.samples.find(p=>p.clearance!=null).s;
-  const span = route.samples.at(-1).s-start;
+  const span = route.samples[route.samples.length - 1].s-start;
   const canvas = document.createElement('canvas');
   canvas.width=4096; canvas.height=768;
   const g=canvas.getContext('2d');

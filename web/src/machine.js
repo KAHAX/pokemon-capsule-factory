@@ -219,7 +219,7 @@ export class CapsuleMachine {
     this.outputs.splice(index, 1);
     this.rareGlows.get(ball)?.dispose();
     this.rareGlows.delete(ball);
-    const next = this.outputs.at(-1);
+    const next = this.outputs[this.outputs.length - 1];
     if (next) next.userData.action = 'collect';
     this.physics.removeBall(ball);
     ball.removeFromParent();
@@ -235,7 +235,7 @@ export class CapsuleMachine {
   }
 
   raycast(raycaster) {
-    const ball = this.outputs.at(-1);
+    const ball = this.outputs[this.outputs.length - 1];
     if (ball) {
       ball.updateWorldMatrix(true, true);
       const bounds = new THREE.Box3().setFromObject(ball);

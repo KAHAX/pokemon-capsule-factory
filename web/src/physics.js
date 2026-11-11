@@ -1,12 +1,11 @@
 import * as THREE from 'three';
-import RAPIER from '@dimforge/rapier3d-compat';
 
 export const BALL_RADIUS = 0.38;
 export const GLOBE_CENTER = new THREE.Vector3(0, 6.15, 0);
 
 let initialization;
 export function initializePhysics() {
-  if (!initialization) initialization = RAPIER.init().then(() => RAPIER);
+  if (!initialization) initialization = import('@dimforge/rapier3d-compat').then(async ({ default: RAPIER }) => { await RAPIER.init(); return RAPIER; });
   return initialization;
 }
 

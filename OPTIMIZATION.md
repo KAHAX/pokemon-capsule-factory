@@ -1,0 +1,26 @@
+# Conservative scene optimization — 2026-11-11
+
+High-quality source + all shipped assets archived locally, before any edits:
+`D:/Codex/2026-11-11/pokemon-capsule-high-quality-53fb9ce.zip`
+Git baseline: `53fb9ce`. ZIP contains 380 files, 1,001,977,532 bytes; excludes rebuildable node_modules/dist.
+
+## Changes
+
+- Background additions: 3,172,581 → 2,422,855 unique triangles. Simplification locks borders, keeps attribute seams, limits relative geometric error to 0.0008, and skips hero-named geometry, glass, text, signs and decals.
+- Chamber shared ball shells: conservative 0.0005 error limit and 70% target. Shell geometry 13,346 → 10,570 triangles, reused by the animated chamber balls. Other chamber mechanisms unchanged.
+- Main machine, bag, cart, box, display props and Pokédex: compression/reordering only; unchanged triangle counts.
+- Core model transfer bytes, including referenced buffers: 164.55 MB → 78.35 MB (52.4% reduction). This is asset size, not a measured network load-time claim.
+- No Pokémon mesh or texture assets changed; output ball and output animation assets unchanged.
+- Original texture image bytes preserved and hashed; node names, material names and animation channels retained. Exporter rounds near-zero node transforms within 0.00001 units.
+- No changes to lights, exposure, glass, shadows, bloom, depth-of-field, outlines, color grading or render resolution.
+- Background Pokémon load after the interactive factory, through a bounded decoder queue (2 touch devices, 3 desktop). Full background population is progressive rather than blocking the first scene.
+- Physics engine is a separate lazy bundle, allowing loading UI and factory downloads to start before its large bundle is parsed.
+- Removed unnecessary observation-canvas preserved framebuffer. Loading displays completed core asset count, preparation stages and a reload button on error; stalled model requests time out after 180 seconds.
+
+## Validation
+
+`npm run build`; `node scripts/validate-optimization.mjs` compares original archive assets to output: index bounds, finite attributes, animation keys, node transforms. `scripts/optimize-scene.mjs` checks texture hashes/material and node identities before writing. Hosting files remain below 25 MiB.
+
+To reproduce, extract the high-quality ZIP separately, then run `node scripts/optimize-scene.mjs <extracted-web/public/assets>`. Do not use already optimized models as input.
+
+Huawei/WeChat real-device load-time and memory behavior need confirmation on the user's phone. A narrow desktop viewport is not a substitute for its GPU/browser/network.

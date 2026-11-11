@@ -5,7 +5,7 @@ import './ui-refinements.css';
 import { installDebugPanel } from './debug-panel.js';
 installDebugPanel();
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createAssetLoader } from './asset-loader.js';
 import { createMainScene } from './scene.js';
 import { CapsuleMachine } from './machine.js';
 import { FocusExperience } from './focus.js';
@@ -33,7 +33,7 @@ const loadingProgress = $('#loading-progress');
 const machineStatus = $('#machine-status');
 const spinButton = $('#spin-button');
 // Start the small ball immediately, before loading the heavier factory assets.
-const ballAssetReady = new GLTFLoader().loadAsync('/assets/pokeball.glb');
+const ballAssetReady = createAssetLoader().loadAsync('/assets/pokeball.glb');
 const loadingBall = new LoadingBall($('#loading-ball-stage'), ballAssetReady);
 let toastTimer;
 
@@ -60,7 +60,7 @@ const homeView = {
   },
 };
 let cameraReturn;
-const loader = new GLTFLoader();
+const loader = createAssetLoader();
 let sceneReady = false;
 let chamberBatches;
 let machine;
@@ -117,11 +117,15 @@ const yieldLoadingFrame = () => new Promise(resolve => requestAnimationFrame(() 
 
 async function initialize() {
   let completed = 0;
+  const setProgress = value => {
+    loadingProgress.style.width = `${value}%`;
+    loadingDetail.textContent = `NOW LOADING... ${value}%`;
+    loadingProgress.parentElement.setAttribute('aria-valuenow', String(value));
+  };
   const progress = (label) => {
-    completed += 1;
-    loadingProgress.style.width = `${completed / 6 * 100}%`;
+
     loadingDetail.setAttribute('aria-label', `NOW LOADING... ${label}`);
-    loadingProgress.parentElement.setAttribute('aria-valuenow', String(Math.min(100, Math.round(completed / 6 * 100))));
+
   };
   const [machineAsset, ballAsset, manifest, rapier, additions, handbag, boxAsset, props, outputAnimation, chamberAnimation, supplyRoute, lighting, replacedParts, cart, pokedexAsset] = await Promise.all([
     loader.loadAsync('/assets/machine.glb').then((asset) => { progress('扭蛋机与输送轨道已就绪'); return asset; }),
@@ -145,7 +149,7 @@ async function initialize() {
     fetch('/assets/v5-replaced-parts.json').then((response) => response.json()),
     loader.loadAsync('/assets/cart-v5.glb'),
     loader.loadAsync('/assets/pokedex.glb?v=lcd-20261105').then((asset) => { progress('宝可梦图鉴与开合机构已就绪'); return asset; }),
-  ]);
+  ].map(promise => promise.then(value => { setProgress(Math.round(++completed / 15 * 80)); return value; })));
   if (props) {
     props.scene.traverse((object) => {
       if (object.isMesh) { object.castShadow = true; object.receiveShadow = true; }
@@ -232,7 +236,7 @@ async function initialize() {
   homeView.background.copy(scene.background);
   backgroundCompanions = new BackgroundCompanions(scene, { machine, camera });
   machine.onSpinInteraction = () => backgroundCompanions?.mew?.startle();
-  const companionReady = backgroundCompanions.load().catch(error => {
+  const loadCompanions = () => backgroundCompanions.load().catch(error => {
     console.error('Background companions:', error);
     toast('背景精灵加载失败，请刷新重试');
   });
@@ -276,14 +280,17 @@ async function initialize() {
   machine.onPrizeSelected = record => focus.prepareRecord(record);
   // Compile before revealing the factory instead of stalling the first visible frame
   // each time another animated character/material arrives.
-  await companionReady;
+  // Background actors arrive after the interactive factory, not on its critical path.
   chamberBatches = batchChamberBalls(machine.chamber);
   chamberBatches.update();
   machine.chamber.renderBatches = chamberBatches.batches;
+  setProgress(90);
   await prepareMainScene();
+  setProgress(96);
   await focus.warmupBall();
   renderMainScene();
   sceneReady = true;
+  setTimeout(loadCompanions, 1200);
   bindMachinePointer();
   loadingProgress.style.width = '100%';
   loadingProgress.parentElement.setAttribute('aria-valuenow', '100');
@@ -320,7 +327,7 @@ async function initialize() {
 let focusFlight;
 
 function startFocusFlight(source) {
-  if (machine.outputs.at(-1) !== source) return;
+  if (machine.outputs[machine.outputs.length - 1] !== source) return;
   const record = source.userData.focusRecord ||= {
     uid: globalThis.crypto?.randomUUID?.() || `ball-${Date.now()}`,
     resultIcon: source.userData.resultIcon,
@@ -538,7 +545,7 @@ window.addEventListener('keydown', (event) => {
     machine?.spin();
   }
   if (event.code === 'KeyE' && !focus?.active && !focusFlight && machine?.outputs.length) {
-    startFocusFlight(machine.outputs.at(-1));
+    startFocusFlight(machine.outputs[machine.outputs.length - 1]);
   }
 });
 const crankHintWorld = new THREE.Vector3(2.08, 2.74, 0.25);
@@ -574,7 +581,7 @@ function frame(dt) {
   dreamscape?.update(dt);
   sound?.update(dt);
   // Prepare only the next uncollected prize while it is still at the outlet.
-  const nextPrize = machine?.outputs.at(-1);
+  const nextPrize = machine?.outputs[machine.outputs.length - 1];
   if (nextPrize && focus && !nextPrize.userData.focusRecord) {
     nextPrize.userData.focusRecord = {
       uid: globalThis.crypto?.randomUUID?.() || `ball-${Date.now()}`,
@@ -602,5 +609,10 @@ initialize().catch((error) => {
   console.error(error);
   loadingDetail.textContent = `资源加载失败：${error.message}`;
   loadingDetail.style.color = '#ef9f8e';
+  const retry = document.createElement('button');
+  retry.textContent = '重新加载';
+  retry.style.cssText = 'margin-top:12px;padding:8px 18px;border:1px solid #e4c38d;border-radius:6px;background:#302620;color:#fff0d8;cursor:pointer';
+  retry.onclick = () => location.reload();
+  loadingDetail.after(retry);
 });
 

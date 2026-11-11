@@ -1,0 +1,58 @@
+[
+  {
+    "file": "scene-v5-additions",
+    "before": 3172581,
+    "after": 2422855,
+    "bytes": 46917552,
+    "textureHashesUnchanged": true
+  },
+  {
+    "file": "chamber-one-shot",
+    "before": 88346,
+    "after": 85570,
+    "bytes": 1738392,
+    "textureHashesUnchanged": true
+  },
+  {
+    "file": "machine",
+    "before": 832610,
+    "after": 832610,
+    "bytes": 13471048,
+    "textureHashesUnchanged": true
+  },
+  {
+    "file": "handbag-v5",
+    "before": 67492,
+    "after": 67492,
+    "bytes": 4505132,
+    "textureHashesUnchanged": true
+  },
+  {
+    "file": "box-v5",
+    "before": 173538,
+    "after": 173538,
+    "bytes": 2934880,
+    "textureHashesUnchanged": true
+  },
+  {
+    "file": "display_props",
+    "before": 82438,
+    "after": 82438,
+    "bytes": 1462388,
+    "textureHashesUnchanged": true
+  },
+  {
+    "file": "cart-v5",
+    "before": 57200,
+    "after": 57200,
+    "bytes": 2603164,
+    "textureHashesUnchanged": true
+  },
+  {
+    "file": "pokedex",
+    "before": 187822,
+    "after": 187822,
+    "bytes": 3689456,
+    "textureHashesUnchanged": true
+  }
+]

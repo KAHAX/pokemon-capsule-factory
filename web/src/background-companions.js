@@ -1,6 +1,6 @@
 import { prepareCompanionRendering } from './companion-rendering.js';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createAssetLoader } from './asset-loader.js';
 import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
 
 import { prepareRaikou, RaikouCompanion } from './raikou-companion.js';
@@ -185,7 +185,7 @@ export class BackgroundCompanions {
   }
 
   async load() {
-    const loader = new GLTFLoader();
+    const loader = createAssetLoader();
     const ids = ['081', '311', '312', '587', '243'];
     const loaded = await Promise.all(ids.map(id => loader.loadAsync(`/assets/companions/${id}.glb`)));
     const assets = Object.fromEntries(ids.map((id, i) => [id, loaded[i]]));

@@ -1,0 +1,301 @@
+[
+  {
+    "file": "scene-v5-additions",
+    "triangles": 3172581,
+    "meshes": 162,
+    "top": [
+      {
+        "name": "SUPPLY · Batch identification lettering.002",
+        "triangles": 257496
+      },
+      {
+        "name": "Logo violet.002",
+        "triangles": 255864
+      },
+      {
+        "name": "Logo yellow.002",
+        "triangles": 247464
+      },
+      {
+        "name": "RELIEF Pikachu · eye glint.001",
+        "triangles": 160128
+      },
+      {
+        "name": "OPT / continuous watertight glass feed tube.001",
+        "triangles": 133632
+      },
+      {
+        "name": "V5 intact / WEB_STATIC_background_046",
+        "triangles": 103880
+      },
+      {
+        "name": "VAT V2 · Pressure monitor dark gasket.002",
+        "triangles": 101072
+      },
+      {
+        "name": "Cylinder.028",
+        "triangles": 93212
+      },
+      {
+        "name": "V5 intact / WEB_STATIC_hero_026",
+        "triangles": 90964
+      },
+      {
+        "name": "Cube.036",
+        "triangles": 80564
+      },
+      {
+        "name": "OPT / hollow glass reservoir.002",
+        "triangles": 77568
+      },
+      {
+        "name": "V5 intact / WEB_STATIC_hero_033",
+        "triangles": 73228
+      },
+      {
+        "name": "V5 intact / WEB_STATIC_hero_023",
+        "triangles": 64492
+      },
+      {
+        "name": "Cylinder.030",
+        "triangles": 62388
+      },
+      {
+        "name": "RELIEF Charmander · eye white.001",
+        "triangles": 61632
+      },
+      {
+        "name": "RELIEF Squirtle · pupil.001",
+        "triangles": 61408
+      },
+      {
+        "name": "Cylinder.023",
+        "triangles": 56584
+      },
+      {
+        "name": "Clean delta / V5_CLEAN / V5_CLEAN / V5_CLEAN / V5_CLEAN / V5_CLEAN / V5_DELTA / FLEECE / warm seamless cyclorama",
+        "triangles": 53204
+      },
+      {
+        "name": "V5 intact / WEB_STATIC_hero_031",
+        "triangles": 53200
+      },
+      {
+        "name": "Logo violet.001",
+        "triangles": 42644
+      }
+    ]
+  },
+  {
+    "file": "machine",
+    "triangles": 832610,
+    "meshes": 933,
+    "top": [
+      {
+        "name": "Logo violet.001",
+        "triangles": 42644
+      },
+      {
+        "name": "Logo yellow.001",
+        "triangles": 41244
+      },
+      {
+        "name": "OPT / hollow glass reservoir",
+        "triangles": 35328
+      },
+      {
+        "name": "OPT / continuous watertight glass feed tube.001",
+        "triangles": 33408
+      },
+      {
+        "name": "OPT / console instructions",
+        "triangles": 25676
+      },
+      {
+        "name": "OPT / delivery legend",
+        "triangles": 20724
+      },
+      {
+        "name": "Rear cabinet legend",
+        "triangles": 18968
+      },
+      {
+        "name": "Floor stencil",
+        "triangles": 18916
+      },
+      {
+        "name": "Parts bin label",
+        "triangles": 17044
+      },
+      {
+        "name": "OPT / accelerator label.001",
+        "triangles": 13044
+      },
+      {
+        "name": "Rear screen title",
+        "triangles": 11464
+      },
+      {
+        "name": "OPT / coin denomination",
+        "triangles": 8332
+      },
+      {
+        "name": "OPT / serial mark",
+        "triangles": 7304
+      },
+      {
+        "name": "WEB / complete service guard",
+        "triangles": 3384
+      },
+      {
+        "name": "OPT / internal drop channel",
+        "triangles": 3072
+      },
+      {
+        "name": "OPT / metering rotor",
+        "triangles": 3072
+      },
+      {
+        "name": "OPT / lower collector mounting foot",
+        "triangles": 3072
+      },
+      {
+        "name": "OPT / crown lower seating flange",
+        "triangles": 3072
+      },
+      {
+        "name": "OPT / crown enamel cover",
+        "triangles": 3072
+      },
+      {
+        "name": "OPT / crown upper cover",
+        "triangles": 3072
+      }
+    ]
+  },
+  {
+    "file": "chamber-one-shot",
+    "triangles": 88346,
+    "meshes": 61,
+    "top": [
+      {
+        "name": "Base_Shell.007",
+        "triangles": 8460
+      },
+      {
+        "name": "Lid_Shell.007",
+        "triangles": 4886
+      },
+      {
+        "name": "SIM_Crowned_Shaft_Cap",
+        "triangles": 3200
+      },
+      {
+        "name": "SIM_Lower_Drive_Bearing",
+        "triangles": 3200
+      },
+      {
+        "name": "SIM_Lower_Three_Way_Hub",
+        "triangles": 3200
+      },
+      {
+        "name": "SIM_Upper_Three_Way_Hub",
+        "triangles": 3200
+      },
+      {
+        "name": "OPT / sealed lower collector.001",
+        "triangles": 2448
+      },
+      {
+        "name": "Torus.002",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.003",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.004",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.005",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.006",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.007",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.010",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.011",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.014",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.015",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.008",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.009",
+        "triangles": 2304
+      },
+      {
+        "name": "Torus.012",
+        "triangles": 2304
+      }
+    ]
+  },
+  {
+    "file": "pokeball",
+    "triangles": 13346,
+    "meshes": 2,
+    "top": [
+      {
+        "name": "Base_Shell",
+        "triangles": 8460
+      },
+      {
+        "name": "Lid_Shell",
+        "triangles": 4886
+      }
+    ]
+  },
+  {
+    "file": "output-sequence",
+    "triangles": 26692,
+    "meshes": 4,
+    "top": [
+      {
+        "name": "Base_Shell.007",
+        "triangles": 8460
+      },
+      {
+        "name": "Base_Shell.008",
+        "triangles": 8460
+      },
+      {
+        "name": "Lid_Shell.007",
+        "triangles": 4886
+      },
+      {
+        "name": "Lid_Shell.008",
+        "triangles": 4886
+      }
+    ]
+  }
+]
