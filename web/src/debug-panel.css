@@ -1,0 +1,11 @@
+#capsule-debug{position:fixed;z-index:10000;top:22px;right:22px;width:min(340px,calc(100vw - 32px));max-height:calc(100vh - 44px);overflow:auto;padding:23px;background:rgba(39,28,22,.96);color:#fff0d0;border:1px solid #ac8654;border-radius:18px;box-shadow:0 16px 60px #0006;font:14px/1.6 system-ui,sans-serif;backdrop-filter:blur(18px);pointer-events:auto}
+#capsule-debug[hidden]{display:none!important}
+#capsule-debug header{display:flex;justify-content:space-between;align-items:center}#capsule-debug h2{margin:0;font-size:21px}#capsule-debug small{font-size:9px;letter-spacing:2px;color:#dcb782}#capsule-debug p{font-size:11px;color:#c7b49b;margin:9px 0 19px}#capsule-debug label{display:flex;justify-content:space-between;margin-top:18px}#capsule-debug output{color:#ffd169;font-variant-numeric:tabular-nums}#capsule-debug input{display:block;width:100%;margin:12px 0;accent-color:#eab55c;cursor:pointer}#capsule-debug button{border:1px solid #9e784b;border-radius:8px;background:#60462c;color:#ffedca;padding:7px 12px;cursor:pointer}#capsule-debug header button{font-size:22px;line-height:1}#debug-reset{margin-top:6px;width:100%}
+
+#capsule-debug .debug-render-heading{border-top:1px solid #ac86544d;padding-top:18px;margin-top:22px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+#capsule-debug .debug-toggle{align-items:center;margin-top:12px;cursor:pointer}
+#capsule-debug .debug-toggle input{appearance:none;position:relative;flex:0 0 38px;width:38px;height:22px;margin:0;border-radius:20px;border:1px solid #977c5b;background:#362a22;transition:background .2s}
+#capsule-debug .debug-toggle input:after{content:'';position:absolute;width:16px;height:16px;top:2px;left:2px;background:#c8bca9;border-radius:50%;transition:transform .2s,background .2s}
+#capsule-debug .debug-toggle input:checked{background:#a67c3e}
+#capsule-debug .debug-toggle input:checked:after{transform:translateX(16px);background:#fff0c9}
+#capsule-debug .debug-toggle input:focus-visible{outline:2px solid #ffe1a0;outline-offset:3px}

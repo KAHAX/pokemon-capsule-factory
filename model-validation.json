@@ -1,0 +1,262 @@
+[
+  {
+    "file": "web/public/assets/pokemon-v5/001.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 10
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/003.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 31
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/009.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 23
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/025-shiny.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 12
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/025.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 12
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/037.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 16
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/052.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 11
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/059.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 6
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/131.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 7
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/133-shiny.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 9
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/133.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 9
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/149.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 6
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/150.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 6
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/196.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 7
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/249.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 12
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/250.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 17
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/257.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 10
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/282.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 6
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/scene-v5-additions.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 1
+    },
+    "introduced": false
+  },
+  {
+    "file": "web/public/assets/scene-v5.glb",
+    "before": {
+      "errors": {},
+      "count": 0
+    },
+    "after": {
+      "errors": {},
+      "count": 0,
+      "warnings": 1
+    },
+    "introduced": false
+  }
+]

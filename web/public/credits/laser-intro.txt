@@ -1,0 +1,8 @@
+Laser introduction: grid proportions, shader construction and reveal easing adapted from Bruno Simon / folio-2025, MIT (copyright 2025 Bruno Simon).
+https://github.com/brunosimon/folio-2025
+License: /credits/bruno-simon-MIT.txt
+
+Photographic all-sky panorama: ESO/S. Brunier.
+https://www.eso.org/public/images/eso0932a/
+Creative Commons Attribution 4.0: https://creativecommons.org/licenses/by/4.0/
+Source resized to 4096x2048, rotated and colour graded in the renderer; no AI generation.

@@ -1,0 +1,87 @@
+@font-face{font-family:"Paytone";src:url("/assets/paytone-one.ttf") format("truetype");font-display:swap}
+.holo-card-host{position:absolute;inset:0;z-index:2;pointer-events:none;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:#eaf5ff;--type-primary:#ffd84d;--type-secondary:#6fe4ff;--type-dark:#081426;--gold:#ffd84d}
+.holo-card-host *{box-sizing:border-box}
+.holo-card-host .svg-sprite{position:absolute;width:0;height:0;overflow:hidden}
+.holo-card-host .type-glyph{width:74%;height:74%;fill:currentColor}
+.holo-card-host svg{display:block}
+.holo-card-positioner{position:absolute;left:50%;top:50%;perspective:clamp(520px,85vh,820px);perspective-origin:50% 50%;transform-style:preserve-3d;will-change:transform,left,top,opacity}
+.holo-card-host .pokemon-card{--rotate-x:0deg;--rotate-y:0deg;--glare-x:50%;--glare-y:35%;position:relative;width:min(360px,calc(100vw - 42px));padding:5px;overflow:hidden;border-radius:19px;background:conic-gradient(from 125deg,var(--type-dark),var(--type-secondary),var(--type-primary),#a976e8,var(--type-secondary),var(--type-primary),var(--type-dark));box-shadow:0 0 0 2px rgba(198,246,255,.65),0 0 0 4px rgba(26,67,99,.8),0 24px 65px rgba(0,0,0,.55),0 0 34px rgba(89,207,255,.12);transform:scale(var(--card-zoom,1)) rotateX(var(--rotate-x)) rotateY(var(--rotate-y));transform-style:preserve-3d;will-change:transform;touch-action:none;user-select:none;cursor:grab}
+.holo-card-host .pokemon-card:active{cursor:grabbing}
+.holo-card-host .pokemon-card:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+.holo-card-host .pokemon-card::before{content:"";position:absolute;z-index:5;inset:5px;border:1px solid rgba(170,232,255,.45);border-radius:13px;pointer-events:none}
+.holo-card-host .card-header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:9px;padding:10px 11px;border-radius:12px 12px 0 0;background:linear-gradient(105deg,var(--type-dark),#102e4d 58%,#09182e);box-shadow:inset 0 1px rgba(196,239,255,.12)}
+.holo-card-host .basic-pill{padding:5px 7px;border:1px solid #ffe998;border-radius:4px;color:#172338;background:var(--type-primary);font-size:10px;font-weight:850;font-style:italic;box-shadow:0 0 12px rgba(255,211,62,.16)}
+.holo-card-host .card-header h1{margin:0;color:#f3f8ff;font:25px/1 "Paytone",sans-serif;letter-spacing:-.6px;white-space:nowrap;text-shadow:0 2px 10px rgba(70,177,230,.25)}
+.holo-card-host .card-header h1 em{color:var(--type-primary);font-size:27px;font-style:italic;-webkit-text-stroke:1px #5b4a13;text-shadow:2px 2px 0 #071426}
+.holo-card-host .card-hp{display:flex;align-items:baseline;gap:3px;color:#f4f8ff}
+.holo-card-host .card-hp span{color:#9eb9c9;font-size:12px;font-weight:750}
+.holo-card-host .card-hp strong{font-size:27px;line-height:1}
+.holo-card-host .energy-icon{display:inline-grid;place-items:center;align-self:center;width:24px;height:24px;margin-left:3px;border:2px solid #fff0a3;border-radius:50%;color:#15253a;background:var(--type-primary);font-size:18px;font-style:normal;font-weight:900;box-shadow:0 0 12px rgba(255,216,77,.25)}
+.holo-card-host .card-viewport{position:relative;aspect-ratio:1/.94;margin:0 8px;overflow:hidden;border:2px solid var(--type-primary);border-radius:6px;background:#050d20;box-shadow:inset 0 0 26px rgba(0,0,0,.5),0 0 18px rgba(66,180,229,.1);contain:strict}
+.holo-card-host .card-viewport canvas{display:block;width:100%;height:100%}
+.holo-card-host .viewport-sheen{position:absolute;z-index:1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 12% 18%,rgba(70,212,255,.12),transparent 58%),radial-gradient(ellipse at 88% 78%,rgba(190,112,255,.1),transparent 62%);mix-blend-mode:screen;box-shadow:inset 0 0 28px rgba(0,3,12,.45)}
+.holo-card-host .art-label{position:absolute;z-index:2;top:11px;left:11px;padding:4px 6px;border:1px solid rgba(139,223,255,.4);border-radius:3px;color:#bceeff;background:rgba(5,18,38,.65);font:7px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:1px;pointer-events:none}
+.holo-card-host .rarity-mark{position:absolute;z-index:2;right:13px;bottom:8px;color:#fff1a5;font-size:29px;text-shadow:0 0 10px #fff,0 0 18px #ffc933;pointer-events:none}
+.holo-card-host .attack-panel{margin:0 11px;padding:12px 2px 10px;border-bottom:1px solid rgba(131,199,231,.2);background:linear-gradient(110deg,#0a1c33,#0b2038)}
+.holo-card-host .attack-heading{display:flex;align-items:center;gap:8px}
+.holo-card-host .attack-heading h2{flex:1;margin:0;color:#f2f8ff;font:21px/1.1 "Paytone",sans-serif;letter-spacing:-.4px}
+.holo-card-host .attack-heading>strong{color:var(--type-primary);font-size:24px}
+.holo-card-host .attack-cost{display:flex;gap:3px}
+.holo-card-host .attack-cost i{display:grid;place-items:center;width:21px;height:21px;border:1.5px solid #ffeb9a;border-radius:50%;color:#15253a;background:var(--type-primary);font-size:15px;font-style:normal;font-weight:900}
+.holo-card-host .attack-panel p{margin:7px 0 0;color:#a9c0cf;font-size:11px;line-height:1.45}
+.holo-card-host .attack-panel p span{display:inline-flex;vertical-align:-2px}
+.holo-card-host .attack-panel p>span:first-child{display:inline}
+.holo-card-host .attack-panel p>span:last-child{width:11px;height:11px;color:var(--type-primary);font-weight:900}
+.holo-card-host .attack-panel p span .type-glyph{width:100%;height:100%}
+.holo-card-host .card-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 11px;padding:10px 0;background:#0a1b31;font-size:9px}
+.holo-card-host .card-stats>div{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:6px 10px;border:1px solid rgba(130,193,222,.22);border-radius:17px;background:linear-gradient(90deg,#102943,#0b1d33)}
+.holo-card-host .card-stats span{color:#8aa5b7}
+.holo-card-host .card-stats strong{display:flex;align-items:center;gap:4px;color:#ecf6ff;font-size:12px}
+.holo-card-host .card-stats i{display:inline-grid;place-items:center;width:19px;height:19px;border:1px solid #91bad0;border-radius:50%;font-style:normal}
+.holo-card-host .fighting-icon{color:#14253a;background:#ed6a3d;font-size:10px}
+.holo-card-host .retreat-icon{background:#edf6ff;color:#14253a}
+.holo-card-host .ex-rule{display:flex;align-items:center;margin:2px 11px 9px;overflow:hidden;border:1px solid #c49a2d;border-radius:6px;background:linear-gradient(90deg,#ffdf65,#fff0a4);color:#172338;font-size:8px;line-height:1.45}
+.holo-card-host .ex-rule strong{display:flex;align-items:center;align-self:stretch;padding:6px 10px;color:#ffe991;background:#0b1b30;font-size:10px;font-style:italic;white-space:nowrap}
+.holo-card-host .ex-rule span{padding:6px 9px}
+.holo-card-host .card-footer{display:flex;align-items:center;justify-content:space-between;min-height:23px;padding:2px 13px 10px;border-radius:0 0 12px 12px;color:#6f8da1;background:#0a1b31;font:6px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.4px}
+.holo-card-host .card-glare{position:absolute;z-index:4;inset:0;border-radius:inherit;pointer-events:none;opacity:.35;background:radial-gradient(circle at var(--glare-x) var(--glare-y),rgba(222,248,255,.4),transparent 34%);mix-blend-mode:screen}
+.holo-card-host .shiny-flow,.holo-card-host .shiny-stars{display:none}
+.holo-card-host .is-shiny{animation:shinyBorder 2.6s ease-in-out infinite}
+.holo-card-host .is-shiny .basic-pill{color:#1d1830;background:linear-gradient(90deg,#fff3a0,#ff9de3,#94f1ff)}
+.holo-card-host .is-shiny .card-header{color:#20345c;background:linear-gradient(105deg,#f4f8ff,#e9e0ff 52%,#fff1c2)}
+.holo-card-host .is-shiny .card-header h1{color:#1a3155;text-shadow:0 0 14px rgba(255,255,255,.85)}
+.holo-card-host .is-shiny .card-header h1 em{color:#9a6500}
+.holo-card-host .is-shiny .card-hp{color:#20345c}
+.holo-card-host .is-shiny .card-hp span{color:#6b7190}
+.holo-card-host .is-shiny .card-viewport{border-color:#fff4b5;box-shadow:inset 0 0 30px rgba(255,255,255,.25),0 0 30px rgba(120,226,255,.65),0 0 48px rgba(238,152,255,.45)}
+.holo-card-host .is-shiny .viewport-sheen{opacity:.85;background:radial-gradient(ellipse at 18% 12%,rgba(255,255,255,.45),transparent 58%),radial-gradient(ellipse at 85% 80%,rgba(255,198,243,.3),transparent 62%)}
+.holo-card-host .is-shiny .attack-panel{border-color:rgba(117,99,169,.25);background:linear-gradient(110deg,#f2f7ff,#eee3ff)}
+.holo-card-host .is-shiny .attack-heading h2{color:#1b3154}
+.holo-card-host .is-shiny .attack-heading>strong{color:#8553b5}
+.holo-card-host .is-shiny .attack-panel p{color:#586a83}
+.holo-card-host .is-shiny .card-stats{background:#eaf0ff}
+.holo-card-host .is-shiny .card-stats>div{border-color:#b7afd2;background:linear-gradient(90deg,#fff,#e9e5ff)}
+.holo-card-host .is-shiny .card-stats span{color:#6a7590}
+.holo-card-host .is-shiny .card-stats strong{color:#263c5c}
+.holo-card-host .is-shiny .card-footer{color:#68738e;background:#eaf0ff}
+.holo-card-host .is-shiny .ex-rule{border-color:#fff;background:linear-gradient(90deg,#fff1a8,#ffe0f3,#c5f3ff)}
+.holo-card-host .is-shiny .ex-rule strong{color:#fff;background:#665096}
+.holo-card-host .is-shiny .rarity-mark{font-size:36px;filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 16px #ffe783)}
+.holo-card-host .is-shiny .shiny-flow{position:absolute;z-index:6;top:-35%;bottom:-35%;left:-75%;display:block;width:68%;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(94,224,255,.3),rgba(255,170,239,.62),rgba(255,255,255,.98),rgba(255,233,135,.65),transparent);transform:skewX(-18deg);mix-blend-mode:screen;filter:blur(4px);animation:shinySweep 2.4s ease-in-out infinite}
+.holo-card-host .is-shiny .shiny-stars{position:absolute;z-index:7;inset:0;display:block;overflow:hidden;border-radius:inherit;pointer-events:none}
+.holo-card-host .shiny-stars span{position:absolute;width:var(--star-size,12px);height:var(--star-size,12px);background:#fff9cf;clip-path:polygon(50% 0,60% 38%,100% 50%,60% 62%,50% 100%,40% 62%,0 50%,40% 38%);filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 14px #ffc8f5);animation:starPulse 1.3s ease-in-out infinite alternate}
+.holo-card-host .is-shiny .card-glare{opacity:.95;background:radial-gradient(circle at var(--glare-x) var(--glare-y),rgba(255,255,255,.78),transparent 42%)}
+@keyframes shinySweep{0%,12%{left:-75%}76%,100%{left:135%}}
+@keyframes starPulse{from{opacity:.25;transform:scale(.45) rotate(0)}to{opacity:1;transform:scale(1.5) rotate(45deg)}}
+@keyframes shinyBorder{0%,100%{box-shadow:0 0 0 2px rgba(218,250,255,.9),0 0 0 4px rgba(174,119,255,.55),0 24px 65px rgba(0,0,0,.45),0 0 42px rgba(123,224,255,.65),0 0 72px rgba(174,119,255,.32)}50%{box-shadow:0 0 0 2px rgba(255,241,163,.95),0 0 0 4px rgba(255,164,228,.65),0 24px 65px rgba(0,0,0,.45),0 0 58px rgba(255,182,232,.75),0 0 92px rgba(255,221,119,.38)}}
+@media(max-height:760px){.holo-card-host .pokemon-card{width:300px}.holo-card-host .card-header{padding-top:7px;padding-bottom:8px}.holo-card-host .card-header h1{font-size:21px}.holo-card-host .card-header h1 em{font-size:22px}.holo-card-host .card-hp strong{font-size:23px}.holo-card-host .attack-heading h2{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.holo-card-host *,.holo-card-host *::before,.holo-card-host *::after{transition:none!important;animation:none!important}.holo-card-host .is-shiny .shiny-flow{left:42%;opacity:.35}}
+
+.focus-active.ball-returning .mini-collection{opacity:1;pointer-events:none}
+#focus-close{display:none!important}
+.holo-card-host .pokemon-card{backface-visibility:hidden}
+.holo-card-back{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-around;border:5px solid var(--type-primary);border-radius:19px;backface-visibility:hidden;transform:rotateY(180deg);pointer-events:none;overflow:hidden;color:#fff0ba;background:radial-gradient(ellipse at 30% 20%,#357e9b88,transparent 65%),radial-gradient(ellipse at 80% 85%,#74499caa,transparent 70%),repeating-linear-gradient(45deg,transparent 0 17px,#ffffff06 18px 19px),#102442;box-shadow:inset 0 0 0 3px #0a182b,inset 0 0 0 5px #d8bd6f88,0 0 24px #8ce5ff44;font:11px ui-monospace,monospace;letter-spacing:3px}
+.holo-card-back i{position:relative;width:48%;aspect-ratio:1;border:4px solid #fff0ba;border-radius:50%;background:linear-gradient(#ca6e69 0 46%,#11233e 46% 54%,#ede6c9 54%);box-shadow:0 0 45px #c5a6ff66;transform:rotate(-25deg)}
+.holo-card-back i:after{content:"";position:absolute;left:36%;top:36%;width:28%;height:28%;border:5px solid #11233e;border-radius:50%;background:#fff0ba}
+
+.holo-card-back{backface-visibility:visible}

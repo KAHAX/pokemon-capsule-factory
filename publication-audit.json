@@ -1,0 +1,162 @@
+[
+  {
+    "file": "web/public/assets/pokemon-v5/001.glb",
+    "originalSha256": "222a9e3577c41e34770f56f75a2b6ab8c6eac2f21d3c1af029e398d211f64c94",
+    "originalBytes": 26949080,
+    "buffers": 2,
+    "bufferViewsVerified": 4959,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/003.glb",
+    "originalSha256": "20a44133bab5f7ee1ab77fb5f6e9c654f12d0de6e3a8d26ebc9aaab88d2a3f24",
+    "originalBytes": 44086508,
+    "buffers": 3,
+    "bufferViewsVerified": 8288,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/009.glb",
+    "originalSha256": "9f2b7a3a3046b7ac7cfeeb6759625620167aea56d180405da541dd6c1ca6728a",
+    "originalBytes": 51663460,
+    "buffers": 3,
+    "bufferViewsVerified": 9835,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/025-shiny.glb",
+    "originalSha256": "3133678cff38a4a812c79b384ea9dee5eb15e83a620ecde9415a3fbcb3e8c27f",
+    "originalBytes": 36117036,
+    "buffers": 2,
+    "bufferViewsVerified": 7246,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/025.glb",
+    "originalSha256": "119cef7a0a617702bc6d641980685f988f16a7c1eb12fc0c5791dc072ee1be02",
+    "originalBytes": 33318152,
+    "buffers": 2,
+    "bufferViewsVerified": 7248,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/037.glb",
+    "originalSha256": "97c343f94bf7ed05acaa4b15d482bfba047e5aafd8e8efbc3c7657b1bb7a67cc",
+    "originalBytes": 27199104,
+    "buffers": 2,
+    "bufferViewsVerified": 5617,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/052.glb",
+    "originalSha256": "49de23e16c372b4c36e8a603b1ad5a6ee7423b1ecf8a346403e7a63807a729c3",
+    "originalBytes": 29558468,
+    "buffers": 2,
+    "bufferViewsVerified": 5934,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/059.glb",
+    "originalSha256": "6acebe88fbd309ee49f2304474c3f57347b6631cb0b00d6b0eab5185738342ba",
+    "originalBytes": 27322568,
+    "buffers": 2,
+    "bufferViewsVerified": 5075,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/131.glb",
+    "originalSha256": "2afd1f847fbe944186b8b56286c3168330a8ec6b185604d4d0a16ca0ed295dd5",
+    "originalBytes": 28870280,
+    "buffers": 2,
+    "bufferViewsVerified": 5685,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/133-shiny.glb",
+    "originalSha256": "7accf30deb87a4c463a8960aaddc1f967957c13b12260c508d673d75e27168bb",
+    "originalBytes": 28474412,
+    "buffers": 2,
+    "bufferViewsVerified": 8342,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/133.glb",
+    "originalSha256": "835f6ba6163267559d70959e9dd45ea6a69f0d717368627ce5396f5b3594e6a9",
+    "originalBytes": 28719596,
+    "buffers": 2,
+    "bufferViewsVerified": 8343,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/149.glb",
+    "originalSha256": "be78a6d0b7c4846fd4acd408efb7f914c59bb845d7817878cacaa3794069158f",
+    "originalBytes": 34047420,
+    "buffers": 2,
+    "bufferViewsVerified": 8131,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/150.glb",
+    "originalSha256": "e03e4faa538e99b492875bbe45543febbe2d356c73ac881d85358f60ffccfac9",
+    "originalBytes": 38860128,
+    "buffers": 2,
+    "bufferViewsVerified": 9175,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/196.glb",
+    "originalSha256": "edb08fd65aefb65501144dd38ab326fc50605664afe14d0db25012c1247d9048",
+    "originalBytes": 35326768,
+    "buffers": 2,
+    "bufferViewsVerified": 8312,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/249.glb",
+    "originalSha256": "b450731ddcc0b63ae22cda6c97dfec87f6faa45cb84b2723ac0057a1b80aebbc",
+    "originalBytes": 65730348,
+    "buffers": 3,
+    "bufferViewsVerified": 14863,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/250.glb",
+    "originalSha256": "721001af0294c40c211aa41b68e916aa7559190066c754045e7530e3218eb75d",
+    "originalBytes": 54040312,
+    "buffers": 3,
+    "bufferViewsVerified": 10520,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/257.glb",
+    "originalSha256": "84da8ca0251bf483c2236b31c8f179bf7a1c2a9b9c95e0b32ca7c953f557c167",
+    "originalBytes": 28929844,
+    "buffers": 2,
+    "bufferViewsVerified": 6417,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/pokemon-v5/282.glb",
+    "originalSha256": "0b0ee7782d5384364538405f8cf2dee295f3c11e61456306217d7920c4306102",
+    "originalBytes": 31422332,
+    "buffers": 2,
+    "bufferViewsVerified": 7652,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/scene-v5-additions.glb",
+    "originalSha256": "b39223be49262b4171bb8993b476a3d6dcaf8aa677600d8dd2b8c94032278ef8",
+    "originalBytes": 118725072,
+    "buffers": 6,
+    "bufferViewsVerified": 646,
+    "lossless": true
+  },
+  {
+    "file": "web/public/assets/scene-v5.glb",
+    "originalSha256": "766e7e312b2579b74889760640a15fc12400a094755c97e001392da2e66ab526",
+    "originalBytes": 119369624,
+    "buffers": 6,
+    "bufferViewsVerified": 702,
+    "lossless": true
+  }
+]

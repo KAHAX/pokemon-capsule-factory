@@ -1,0 +1,17 @@
+.pokedex-canvas{position:absolute;inset:0;z-index:7;pointer-events:none}
+body .pack-button{width:60px;height:60px;right:30px;bottom:25px;display:block;padding:0}
+body .pack-button .pack-art,body .pack-button>span:last-child{display:none}
+body .mini-collection{right:104px;bottom:34px}
+.pack-button.pokedex-viewing{opacity:0;pointer-events:none}
+.pokedex-close{display:none;position:absolute;top:34px;right:38px;z-index:9}
+.pokedex-close.visible{display:block}
+.pokedex-hint{display:none;position:absolute;left:50%;bottom:34px;z-index:8;transform:translateX(-50%);color:#f3e4cd;font:11px 'DM Mono',monospace;letter-spacing:1px;pointer-events:none;white-space:nowrap;text-shadow:0 1px 6px #2b211c}
+.pokedex-hint.visible{display:block}
+.pokedex-live-preview{position:fixed;left:-2000px;top:0;width:600px;height:850px;pointer-events:none;contain:layout paint;opacity:0}
+.pokedex-live-preview .holo-card-positioner{left:0!important;top:0!important;transform:none!important}
+@media(max-width:800px){body .pack-button{right:12px;bottom:16px;width:60px;height:60px}body .mini-collection{right:84px;bottom:25px}.pokedex-close{right:20px;top:20px}.pokedex-hint{font-size:9px;bottom:24px}}
+
+body.pokedex-open .ui-layer,body.pokedex-open .supply-debug{opacity:0!important;pointer-events:none!important;visibility:hidden}
+.pokedex-close{top:50%;right:38px;transform:translateY(-50%);width:174px;z-index:9}
+.pokedex-close.visible{display:grid}
+@media(max-width:800px){.pokedex-close{top:auto;bottom:70px;right:18px;transform:none;width:144px}}

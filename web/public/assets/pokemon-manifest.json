@@ -1,0 +1,242 @@
+[
+  {
+    "id": "001",
+    "name": "Bulbasaur",
+    "file": "pokemon/001_Bulbasaur.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "001_Bulbasaur | pm0001_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "003",
+    "name": "Venusaur",
+    "file": "pokemon/003_Venusaur.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "003_Venusaur | pm0003_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "004",
+    "name": "Charmander",
+    "file": "pokemon/004_Charmander.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "004_Charmander | pm0004_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "006",
+    "name": "Charizard",
+    "file": "pokemon/006_Charizard.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "006_Charizard | pm0006_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "007",
+    "name": "Squirtle",
+    "file": "pokemon/007_Squirtle.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "007_Squirtle | pm0007_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "009",
+    "name": "Blastoise",
+    "file": "pokemon/009_Blastoise.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "009_Blastoise | pm0009_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "025",
+    "name": "Pikachu",
+    "file": "pokemon/025_Pikachu.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "025_Pikachu | pm0025_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "037",
+    "name": "Vulpix",
+    "file": "pokemon/037_Vulpix.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "037_Vulpix | pm0037_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "039",
+    "name": "Jigglypuff",
+    "file": "pokemon/039_Jigglypuff.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "039_Jigglypuff | pm0039_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "052",
+    "name": "Meowth",
+    "file": "pokemon/052_Meowth.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "052_Meowth | pm0052_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "054",
+    "name": "Psyduck",
+    "file": "pokemon/054_Psyduck.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "054_Psyduck | pm0054_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "059",
+    "name": "Arcanine",
+    "file": "pokemon/059_Arcanine.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "059_Arcanine | pm0059_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "094",
+    "name": "Gengar",
+    "file": "pokemon/094_Gengar.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "094_Gengar | pm0094_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "130",
+    "name": "Gyarados",
+    "file": "pokemon/130_Gyarados.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "130_Gyarados | pm0130_00_00_10000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "131",
+    "name": "Lapras",
+    "file": "pokemon/131_Lapras.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "131_Lapras | pm0131_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "133",
+    "name": "Eevee",
+    "file": "pokemon/133_Eevee.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "133_Eevee | pm0133_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "143",
+    "name": "Snorlax",
+    "file": "pokemon/143_Snorlax.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "143_Snorlax | pm0143_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "149",
+    "name": "Dragonite",
+    "file": "pokemon/149_Dragonite.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "149_Dragonite | pm0149_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "150",
+    "name": "Mewtwo",
+    "file": "pokemon/150_Mewtwo.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "150_Mewtwo | pm0150_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "151",
+    "name": "Mew",
+    "file": "pokemon/151_Mew.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "151_Mew | pm0151_00_00_20000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "175",
+    "name": "Togepi",
+    "file": "pokemon/175_Togepi.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "175_Togepi | pm0175_00_ba10_waitA01.gfbanm"
+  },
+  {
+    "id": "196",
+    "name": "Espeon",
+    "file": "pokemon/196_Espeon.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "196_Espeon | pm0196_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "197",
+    "name": "Umbreon",
+    "file": "pokemon/197_Umbreon.glb",
+    "sizeClass": "small",
+    "size_class": "小体型",
+    "animation": "197_Umbreon | pm0197_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "249",
+    "name": "Lugia",
+    "file": "pokemon/249_Lugia.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "249_Lugia | pm0249_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "250",
+    "name": "HoOh",
+    "file": "pokemon/250_HoOh.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "250_HoOh | pm0250_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "257",
+    "name": "Blaziken",
+    "file": "pokemon/257_Blaziken.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "257_Blaziken | pm0257_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "282",
+    "name": "Gardevoir",
+    "file": "pokemon/282_Gardevoir.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "282_Gardevoir | pm0282_00_00_00000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "384",
+    "name": "Rayquaza",
+    "file": "pokemon/384_Rayquaza.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "384_Rayquaza | pm0384_00_00_20000_defaultwait01_loop.gfbanm"
+  },
+  {
+    "id": "448",
+    "name": "Lucario",
+    "file": "pokemon/448_Lucario.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "448_Lucario | pm0448_00_00_00000_defaultwait01_loop"
+  },
+  {
+    "id": "658",
+    "name": "Greninja",
+    "file": "pokemon/658_Greninja.glb",
+    "sizeClass": "large",
+    "size_class": "大体型",
+    "animation": "658_Greninja | pm0725_11_00_00000_defaultwait01_loop"
+  }
+]
