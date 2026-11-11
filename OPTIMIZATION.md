@@ -24,3 +24,15 @@ Git baseline: `53fb9ce`. ZIP contains 380 files, 1,001,977,532 bytes; excludes r
 To reproduce, extract the high-quality ZIP separately, then run `node scripts/optimize-scene.mjs <extracted-web/public/assets>`. Do not use already optimized models as input.
 
 Huawei/WeChat real-device load-time and memory behavior need confirmation on the user's phone. A narrow desktop viewport is not a substitute for its GPU/browser/network.
+
+## Mobile runtime follow-up — 2026-11-12
+
+User authorized mobile smoothness over fine raster detail, keeping the lighting style. Coarse-pointer/no-hover devices now use a 30 fps render ceiling and adaptive pixel ratio (starts at 0.9, bounded 0.65–1.0). Slow frames reduce resolution; recovery requires sustained spare capacity. Desktop settings remain unchanged.
+
+- Keep the same light colors/intensities, materials, glass, bloom, depth of field, grading and outlines. Scale outline sample width with actual mobile pixel ratio.
+- Mobile shadow maps use 1024 pixels and update at most 20 times/sec. Landscape touch devices no longer enable desktop 4x offscreen MSAA.
+- Distant companion animation updates share accumulated elapsed time at a reduced cadence; no Pokémon geometry removed or reduced.
+- Idle docked Pokédex draws at most 12 times/sec. Full viewer/flight interactions retain the main frame rate. Freeze the factory canvas behind the mobile Pokédex viewer, and redraw on resize.
+- Mobile observation, card and Pokédex renderers cap pixel ratio at 1.0; HTML text remains at native browser resolution.
+
+Validation: `node scripts/check-mobile-performance.mjs` checks device detection, adaptation bounds, warmup, slow-device response and recovery hysteresis; production build passes. Desktop Chrome touch emulation loaded the scene at 412×915 with a 370×823 main framebuffer, no context loss or shader failures. This verifies the mobile code path, not Huawei frame rate.

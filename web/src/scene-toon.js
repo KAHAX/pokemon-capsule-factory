@@ -1,10 +1,11 @@
+import { mobilePerformance } from './mobile-performance.js';
 import { companionOutlines } from './companion-rendering.js';
 import * as THREE from 'three';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { getDisplaySettings } from './debug-settings.js';
 
 // Preserve the existing charcoal outlines with the original continuous material lighting.
-export function createSceneToon(scene, camera, depthOfField) {
+export function createSceneToon(scene, camera, depthOfField, renderer) {
   const outline = new ShaderPass({
     uniforms: {
       tDiffuse: { value: null }, tDepth: { value: depthOfField.renderTargetDepth.texture },
@@ -50,7 +51,8 @@ export function createSceneToon(scene, camera, depthOfField) {
   outline.setSize = (width, height) => {
     baseSetSize(width, height);
     outline.uniforms.resolution.value.set(width, height);
-    outline.uniforms.lineWidth.value = Math.min(window.devicePixelRatio || 1, 2) * 2.0;
+    outline.uniforms.lineWidth.value = (mobilePerformance
+      ? renderer.getPixelRatio() : Math.min(window.devicePixelRatio || 1, 2)) * 2.0;
   };
   return {
     outline,

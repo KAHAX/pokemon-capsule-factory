@@ -1,3 +1,4 @@
+import { mobilePerformance } from './mobile-performance.js';
 import { prepareVineDisplay } from './vine-display.js';
 import { BallPanControls } from './ball-pan-controls.js';
 import * as THREE from 'three';
@@ -129,7 +130,7 @@ export class FocusExperience {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, stencil: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 800 ? 1.2 : 1.75));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobilePerformance ? 1 : window.innerWidth < 800 ? 1.2 : 1.75));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.15;
@@ -225,7 +226,7 @@ export class FocusExperience {
     const height = viewport.clientHeight;
     if (!width || !height) return;
     const renderer = this.overlayRenderer || this.renderer;
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, width < 800 ? 1.2 : 1.75);
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, mobilePerformance ? 1 : width < 800 ? 1.2 : 1.75);
     if (renderer.getPixelRatio() !== pixelRatio) renderer.setPixelRatio(pixelRatio);
     renderer.setSize(width, height, false);
     if (!this.isMainScene) {

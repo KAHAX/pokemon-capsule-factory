@@ -1,3 +1,4 @@
+import { mobilePerformance } from './mobile-performance.js';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { findByKey } from './assets.js';
@@ -46,7 +47,7 @@ export class PokedexPack {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobilePerformance ? 1 : 1.75));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = .85;
@@ -220,11 +221,12 @@ export class PokedexPack {
     const width = window.innerWidth;
     const height = window.innerHeight;
     if (!width || !height) return;
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.75);
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, mobilePerformance ? 1 : 1.75);
     if (this.renderer.getPixelRatio() !== pixelRatio) this.renderer.setPixelRatio(pixelRatio);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height, false);
+    this.forceDockRender=true;
   }
 
   setOpenAmount(value) {
@@ -563,7 +565,11 @@ export class PokedexPack {
       }
     }
     this.updatePose();
-    this.renderer.render(this.scene, this.camera);
+    this.dockRenderTime = (this.dockRenderTime || 0) + dt;
+    if (!mobilePerformance || !dockIdle || this.dockHover !== hoverTarget || this.dockRenderTime >= 1 / 12 || this.forceDockRender) {
+      this.renderer.render(this.scene, this.camera);
+      this.dockRenderTime=0; this.forceDockRender=false;
+    }
   }
 }
 

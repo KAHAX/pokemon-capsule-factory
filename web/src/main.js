@@ -1,3 +1,4 @@
+import { mobilePerformance } from './mobile-performance.js';
 import { batchChamberBalls } from './chamber-batching.js';
 import { installNextPokemonPanel } from './next-pokemon-panel.js';
 import './style.css';
@@ -45,7 +46,7 @@ function toast(message) {
   toastTimer = setTimeout(() => element.classList.remove('show'), 2600);
 }
 
-const { scene, camera, renderer, controls, updateCamera, bloom, dreamTime, prepare: prepareMainScene, needsRender: mainNeedsRender, render: renderMainScene } = createMainScene($('#machine-stage'));
+const { scene, camera, renderer, controls, updateCamera, bloom, dreamTime, adaptResolution, prepare: prepareMainScene, needsRender: mainNeedsRender, render: renderMainScene } = createMainScene($('#machine-stage'));
 const homeView = {
   position: camera.position.clone(),
   target: controls.target.clone(),
@@ -562,10 +563,18 @@ function updateCrankHint() {
 }
 const clock = new THREE.Clock();
 let manualFrames = false;
+let mobileFrameTime = 0;
+let companionFrameTime = 0;
 function animate() {
   requestAnimationFrame(animate);
-  const dt = Math.min(clock.getDelta(), 0.5);
-  if (manualFrames) return;
+  let dt = Math.min(clock.getDelta(), 0.5);
+  if (manualFrames || document.hidden) { mobileFrameTime=0; return; }
+  if (mobilePerformance) {
+    mobileFrameTime += dt;
+    if (mobileFrameTime < 1 / 30 - .001) return;
+    dt = mobileFrameTime; mobileFrameTime=0;
+    if (sceneReady && !focus?.active && !pokedexPack?.viewer) adaptResolution(dt);
+  }
   frame(dt);
 }
 // Debug: step the whole app by a fixed dt (works while the window is not painting).
@@ -573,7 +582,7 @@ window.__stepFrames = (dt, enable = true) => { manualFrames = enable; if (dt) fr
 function frame(dt) {
   if (!sceneReady) return;
   if (cameraReturn) updateCameraReturn(dt);
-  else if (!focus?.active && !focusFlight) updateCamera(dt);
+  else if (!focus?.active && !focusFlight && !(mobilePerformance && pokedexPack?.viewer)) updateCamera(dt);
   updateFocusFlight(dt);
   updateBackgroundFade(dt);
   machine?.update(dt);
@@ -592,13 +601,19 @@ function frame(dt) {
   }
   boxInteraction?.update(dt);
   captureBalls.forEach((ball) => ball.update(dt));
-  if (!focus?.active && !focusFlight && !document.hidden) backgroundCompanions?.update(dt);
+  const frozenFactory = mobilePerformance && pokedexPack?.viewer && !pokedexPack?.transition;
+  if (!focus?.active && !focusFlight && !frozenFactory && !document.hidden) {
+    companionFrameTime += dt;
+    if (!mobilePerformance || companionFrameTime >= .05) {
+      backgroundCompanions?.update(companionFrameTime); companionFrameTime=0;
+    }
+  } else companionFrameTime=0;
   pokedexLook?.update(dt);
   retroOverlay?.set(Boolean(focus?.active || focusFlight || pokedexPack?.viewer));
   pokedexPack?.update(dt);
   focus?.update(dt);
   // Resizing clears the frozen factory canvas too; redraw it once behind a viewer.
-  if (mainNeedsRender() || (!focus?.active && !$('#pack-dialog').open)) renderMainScene();
+  if (mainNeedsRender() || (!frozenFactory && !focus?.active && !$('#pack-dialog').open)) renderMainScene();
   if (focusFlight) focus.renderFlightPreview(focusFlight.ball, focusFlight.outlineStrength, focusFlight.record);
   updateCrankHint();
   if (machine && spinButton) spinButton.disabled = machine.busy || focus?.active || Boolean(focusFlight);

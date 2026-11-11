@@ -1,3 +1,4 @@
+import { mobilePerformance } from './mobile-performance.js';
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { addNightStars } from './night-stars.js';
@@ -42,7 +43,7 @@ export function applyBlenderLighting(scene, renderer, settings) {
     shadow.position.fromArray(key.position);
     shadow.target.position.copy(shadow.position).add(new THREE.Vector3().fromArray(key.direction));
     shadow.castShadow = true;
-    const shadowSize = window.innerWidth >= 800 ? Math.min(4096, renderer.capabilities.maxTextureSize) : 2048;
+    const shadowSize = mobilePerformance ? 1024 : window.innerWidth >= 800 ? Math.min(4096, renderer.capabilities.maxTextureSize) : 2048;
     shadow.shadow.mapSize.set(shadowSize, shadowSize);
     Object.assign(shadow.shadow.camera, { left: -13, right: 13, top: 16, bottom: -10, near: 1, far: 55 });
     shadow.shadow.bias = -0.0003;
@@ -64,7 +65,7 @@ export function applyBlenderLighting(scene, renderer, settings) {
   heroSpot.position.set(-3.5, 12, 9);
   heroSpot.target.position.set(0, 4.2, 0);
   heroSpot.castShadow = true;
-  heroSpot.shadow.mapSize.set(2048, 2048);
+  heroSpot.shadow.mapSize.set(mobilePerformance ? 1024 : 2048, mobilePerformance ? 1024 : 2048);
   heroSpot.shadow.camera.near = .5;
   heroSpot.shadow.camera.far = 32;
   heroSpot.shadow.bias = -.00015;

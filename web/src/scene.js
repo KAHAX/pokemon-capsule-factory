@@ -1,3 +1,4 @@
+import { mobilePerformance, MobileResolutionBudget } from './mobile-performance.js';
 import { companionOutlines } from './companion-rendering.js';
 import { createSceneToon } from './scene-toon.js';
 import * as THREE from 'three';
@@ -12,11 +13,12 @@ import { createGradePass } from './dreamscape/grade-pass.js';
 import { GodRaysPass } from './dreamscape/god-rays.js';
 
 export function createMainScene(container) {
+  const mobileBudget = new MobileResolutionBudget();
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#6f5c50');
   scene.fog = new THREE.Fog('#6f5c50', 80, 180);
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(window.innerWidth < 800
+  renderer.setPixelRatio(mobilePerformance ? Math.min(window.devicePixelRatio || 1, mobileBudget.ratio) : window.innerWidth < 800
     ? Math.min(window.devicePixelRatio, 1.5)
     : Math.min(Math.max(window.devicePixelRatio, 1.25), 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -76,7 +78,7 @@ export function createMainScene(container) {
 
   // Canvas antialiasing does not cover offscreen postprocessing targets.
   const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType });
-  target.samples = renderer.capabilities.isWebGL2 && window.innerWidth >= 800
+  target.samples = !mobilePerformance && renderer.capabilities.isWebGL2 && window.innerWidth >= 800
     ? Math.min(4, renderer.capabilities.maxSamples) : 0;
   const composer = new EffectComposer(renderer, target);
   composer.addPass(new RenderPass(scene, camera));
@@ -108,7 +110,7 @@ export function createMainScene(container) {
       hidden.forEach(object => { object.visible = true; });
     }
   };
-  const stylization = createSceneToon(scene, camera, depthOfField);
+  const stylization = createSceneToon(scene, camera, depthOfField, renderer);
   composer.addPass(stylization.outline);
   const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.45, 0.4, 1.0);
   composer.addPass(bloom);
@@ -159,7 +161,7 @@ export function createMainScene(container) {
     const height = container.clientHeight;
     if (!width || !height) return;
     const dpr = window.devicePixelRatio || 1;
-    const pixelRatio = width < 800 ? Math.min(dpr, 1.5) : Math.min(Math.max(dpr, 1.25), 2);
+    const pixelRatio = mobilePerformance ? Math.min(dpr, mobileBudget.ratio) : width < 800 ? Math.min(dpr, 1.5) : Math.min(Math.max(dpr, 1.25), 2);
     if (renderer.getPixelRatio() !== pixelRatio) renderer.setPixelRatio(pixelRatio);
     camera.aspect = width / height;
     // Preserve the desktop view and keep the same horizontal room on narrow screens.
@@ -175,9 +177,16 @@ export function createMainScene(container) {
   resizeObserver.observe(container);
   resize();
   const focusPoint = new THREE.Vector3();
+  let lastShadowUpdate = -Infinity;
+  if (mobilePerformance) renderer.shadowMap.autoUpdate = false;
   return { scene, camera, renderer, controls, updateCamera, bloom, dreamTime,
+    adaptResolution: dt => { if (mobilePerformance && mobileBudget.sample(dt)) resize(); },
     prepare: async () => { stylization.prepare(); await renderer.compileAsync(scene, camera); }, needsRender: () => resizePending, render: () => {
     resizePending = false;
+    if (mobilePerformance && performance.now() - lastShadowUpdate >= 50) {
+      renderer.shadowMap.needsUpdate = true;
+      lastShadowUpdate = performance.now();
+    }
     scene.userData.mainRenderFrame = (scene.userData.mainRenderFrame || 0) + 1;
     dreamTime.value = performance.now() / 1000;
     grade.uniforms.dsTime.value = dreamTime.value;
