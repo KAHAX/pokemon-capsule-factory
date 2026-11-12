@@ -11,11 +11,10 @@ import { choosePrizeIcon } from './debug-settings.js';
 export function chooseFinalIcon(random = Math.random) { return choosePrizeIcon(random); }
 
 export class CapsuleMachine {
-  constructor({ scene, model, ballTemplate, physics, outputAnimation, chamberAnimation, supplyRoute, replacedParts = [], onQueue, onStatus, onOutputReady, onOutputCollected }) {
+  constructor({ scene, model, ballTemplate, outputAnimation, chamberAnimation, supplyRoute, replacedParts = [], onQueue, onStatus, onOutputReady, onOutputCollected }) {
     this.scene = scene;
     this.root = model.scene;
     this.ballTemplate = ballTemplate;
-    this.physics = physics;
     this.outputAnimator = new OutputAnimator(scene, outputAnimation);
     this.chamber = new ChamberOneShot(scene, chamberAnimation);
     this.onQueue = onQueue;
@@ -221,7 +220,8 @@ export class CapsuleMachine {
     this.rareGlows.delete(ball);
     const next = this.outputs[this.outputs.length - 1];
     if (next) next.userData.action = 'collect';
-    this.physics.removeBall(ball);
+    // Chamber and outlet motion use authored collision clips; no live Rapier
+    // bodies are created. Avoid downloading/initializing an unused physics world.
     ball.removeFromParent();
     this.onOutputCollected(ball);
     this.onStatus(this.outputs.length ? `出口已有 ${this.outputs.length} 颗 · 可继续扭蛋` : '输送带运行中');

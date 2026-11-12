@@ -7,6 +7,7 @@ import { upgradeScreens } from './screens.js';
 import { enhanceCrank } from './crank.js';
 import { ShinyOutletFX } from './shiny-outlet.js';
 import { removeMiddleSigns, raiseHangingDisplays } from './cleanup.js';
+import { restoreMedallionGlow } from './medallion-glow.js';
 import './dreamscape.css';
 
 /**
@@ -56,12 +57,12 @@ export function installDreamscape({ scene, renderer, camera, controls, bloom, ti
   scene.add(mist);
   noDepth.add(mist);
 
-  const heroFrom = new THREE.Vector3(-3.5, 12, 9);
-  const heroTarget = new THREE.Vector3(0, 4.2, 0);
+  const heroFrom = new THREE.Vector3(-8, 12, 10);
+  const heroTarget = new THREE.Vector3(0, 2.8, .8);
   const heroDir = heroTarget.clone().sub(heroFrom);
   const heroEnd = heroFrom.clone().addScaledVector(heroDir, (groundY - heroFrom.y) / heroDir.y);
   const warmShaft = createLightShaft({ from: heroFrom.clone().addScaledVector(heroDir, -.6), to: heroEnd,
-    radiusTop: .35, radiusBottom: 7.2, color: '#ffdcae', intensity: .04, time });
+    radiusTop: .35, radiusBottom: 7.2, color: '#ffdcae', intensity: .018, time });
   const moonShaft = createLightShaft({ from: new THREE.Vector3(-30, 34, -34), to: new THREE.Vector3(-14, groundY, -12),
     radiusTop: 1.2, radiusBottom: 11, color: '#7fa8ff', intensity: .045, time });
   const motes = createFireflies({ center, time });
@@ -72,6 +73,7 @@ export function installDreamscape({ scene, renderer, camera, controls, bloom, ti
   enhanceCrank(machine?.crank);
   removeMiddleSigns(scene);
   scene.userData.raisedDisplays = raiseHangingDisplays(scene);
+  restoreMedallionGlow(scene);
   applyPrintedGlass(scene).catch(error => console.warn('Dreamscape glass:', error));
 
   const lights = addMoonlight(scene);

@@ -2,30 +2,37 @@ import * as THREE from 'three';
 
 // Isolated cable components in the authored static meshes; the rest stays untouched.
 export function softenSuspensionThreads(object) {
-  const spec = object.name.includes('WEB_STATIC_hero_026')
-    ? { count: 79080, groups: [[74904,4,160],[78400,2,128],[78824,2,128]] }
-    : object.name.includes('WEB_STATIC_background_052')
-      ? { count: 44162, groups: [[40886,12,160],[43394,6,128]] } : null;
-  const source = object.geometry;
-  if (!spec || source.attributes.position.count !== spec.count || !source.index) return null;
-  const positions = [], normals = [], heights = [], remap = new Map();
-  const position = source.attributes.position, normal = source.attributes.normal;
-  for (const [start, strands, count] of spec.groups) {
-    for (let strand = 0; strand < strands; strand++) {
-      const first = start + strand * count;
-      let bottom = Infinity, top = -Infinity;
-      for (let i = first; i < first + count; i++) {
-        bottom = Math.min(bottom, position.getY(i)); top = Math.max(top, position.getY(i));
-      }
-      for (let i = first; i < first + count; i++) {
-        const height = (position.getY(i) - bottom) / (top - bottom) * 4.5;
-        remap.set(i, heights.length);
-        positions.push(position.getX(i), bottom + height, position.getZ(i));
-        normals.push(normal.getX(i), normal.getY(i), normal.getZ(i));
-        heights.push(height);
-      }
+  if (!/WEB_STATIC_hero_026|WEB_STATIC_background_052/.test(object.name)) return null;
+  const source=object.geometry;
+  if(!source.index)return null;
+  const position=source.attributes.position,normal=source.attributes.normal;
+  // Find actual cable components: exported/optimized vertex offsets are not stable.
+  const parent=Int32Array.from({length:position.count},(_,i)=>i),weld=new Map();
+  const root=i=>{while(parent[i]!==i){parent[i]=parent[parent[i]];i=parent[i];}return i;};
+  const join=(a,b)=>{a=root(a);b=root(b);if(a!==b)parent[b]=a;};
+  for(let i=0;i<position.count;i++){
+    const key=[position.getX(i),position.getY(i),position.getZ(i)].map(v=>Math.round(v*10000)).join(',');
+    if(weld.has(key))join(i,weld.get(key));else weld.set(key,i);
+  }
+  const ids=source.index.array;
+  for(let i=0;i<ids.length;i+=3){join(ids[i],ids[i+1]);join(ids[i],ids[i+2]);}
+  const groups=new Map(),v=new THREE.Vector3();
+  for(const i of new Set(ids)){
+    const r=root(i);if(!groups.has(r))groups.set(r,{box:new THREE.Box3(),ids:[]});
+    const g=groups.get(r);g.ids.push(i);g.box.expandByPoint(v.fromBufferAttribute(position,i));
+  }
+  const positions=[],normals=[],heights=[],remap=new Map();
+  for(const {box,ids:vertices} of groups.values()){
+    const size=box.getSize(new THREE.Vector3());
+    if(size.y<10||size.x>.12||size.z>.12)continue;
+    for(const i of vertices){
+      const height=(position.getY(i)-box.min.y)/size.y*4.5;
+      remap.set(i,heights.length);
+      positions.push(position.getX(i),box.min.y+height,position.getZ(i));
+      normals.push(normal.getX(i),normal.getY(i),normal.getZ(i));heights.push(height);
     }
   }
+  if(!heights.length)return null;
   const solidIndices = [], threadIndices = [], indices = source.index.array;
   for (let i = 0; i < indices.length; i += 3) {
     const a = remap.get(indices[i]), b = remap.get(indices[i+1]), c = remap.get(indices[i+2]);

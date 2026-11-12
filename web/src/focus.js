@@ -1,9 +1,11 @@
 import { mobilePerformance } from './mobile-performance.js';
+import { scenePixelRatio } from './render-budget.js';
+import { pickInteractionClips, pickCardClips } from './pokemon-animation-policy.js';
 import { prepareVineDisplay } from './vine-display.js';
 import { BallPanControls } from './ball-pan-controls.js';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createAssetLoader } from './asset-loader.js';
 import { createStudioEnvironment } from './studio-environment.js';
 import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
 import { instantiateBall, findByKey, easeOutCubic } from './assets.js';
@@ -16,24 +18,12 @@ import { measureModelBounds, measureBodyFrame } from './card-framing.js';
 import { BallDragControls } from './ball-controls.js';
 import { applyCollectionEffects, cloneStyledMaterial, CollectionRenderer } from './collection-effects.js';
 
-// Expressive, readable poses for the card portrait (in order of preference).
-const ACTION_POSES = [/glad01/, /roar01/, /rangeattack01\.gfbanm/, /battlewait01_loop/, /attack01/, /notice01/];
-function pickActionClips(animations = []) {
-  const picked = [];
-  for (const pattern of ACTION_POSES) {
-    if (/loop/.test(pattern.source)) continue;
-    const clip = animations.find(item => pattern.test(item.name) && !/loop/i.test(item.name));
-    if (clip && !picked.includes(clip)) picked.push(clip);
-  }
-  return picked.slice(0, 4);
-}
-
 export class PokemonLibrary {
   constructor(manifest) {
     this.entries = manifest;
     this.cache = new Map();
     this.framingCache = new Map();
-    this.loader = new GLTFLoader();
+    this.loader = createAssetLoader();
   }
 
   random(shiny = false) {
@@ -100,7 +90,7 @@ export class PokemonLibrary {
     wrapper.userData.updateEffects = await applyCollectionEffects(source, entry);
     // Frame the resting body, not the union of every attack/jump pose: the latter
     // makes the ordinary portrait tiny. Expressive actions may extend past the art window.
-    const actions = pickActionClips(animations);
+    const actions = pickCardClips(animations);
     wrapper.userData.cardAnimation = animation;
     wrapper.userData.cardActions = actions;
     await new Promise(resolve => setTimeout(resolve, 0));
@@ -226,7 +216,7 @@ export class FocusExperience {
     const height = viewport.clientHeight;
     if (!width || !height) return;
     const renderer = this.overlayRenderer || this.renderer;
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, mobilePerformance ? 1 : width < 800 ? 1.2 : 1.75);
+    const pixelRatio = scenePixelRatio(width, height, window.devicePixelRatio || 1, mobilePerformance ? 1 : null);
     if (renderer.getPixelRatio() !== pixelRatio) renderer.setPixelRatio(pixelRatio);
     renderer.setSize(width, height, false);
     if (!this.isMainScene) {
@@ -660,7 +650,7 @@ export class FocusExperience {
   playPokemonInteraction() {
     if (this.mode !== 'revealed' || !this.pokemonMixer || this.interactionAction) return;
     const clips = this.pokemonAnimations || [];
-    const candidates = clips.filter(clip => /glad|refresh|defaultidle|notice|roar|buffact|speact|wing|attack/i.test(clip.name) && !/start|end/i.test(clip.name));
+    const candidates = pickInteractionClips(clips);
     const choices = candidates.filter(clip => clip !== this.lastInteraction);
     const clip = (choices.length ? choices : candidates)[Math.floor(Math.random() * (choices.length || candidates.length))];
     if (!clip) return;

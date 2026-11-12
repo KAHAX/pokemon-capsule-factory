@@ -184,8 +184,15 @@ export class BackgroundCompanions {
     this.pals = [];
   }
 
-  async load() {
-    const loader = createAssetLoader();
+  async load({ onProgress = () => {} } = {}) {
+    const assetLoader = createAssetLoader();
+    let completed = 0;
+    const loader = { loadAsync: async url => {
+      const asset = await assetLoader.loadAsync(url);
+      onProgress(++completed, 12);
+      return asset;
+    } };
+    this.loadErrors = [];
     const ids = ['081', '311', '312', '587', '243'];
     const loaded = await Promise.all(ids.map(id => loader.loadAsync(`/assets/companions/${id}.glb`)));
     const assets = Object.fromEntries(ids.map((id, i) => [id, loaded[i]]));
@@ -201,9 +208,11 @@ export class BackgroundCompanions {
     });
     // Separate repair stations; the additional technicians work on existing terminals.
     const stations = [
-      { position: [-8.4, 3.1, -1.05], circuit: [-9.6, 2.15, -2.24], normal: [0, 0, 1], size: 1.45, panel: 1, yaw: .2, hand: 'left_hand', offset: 0 },
+      // One support bay toward the machine keeps the entire animated rig and
+      // repair arc clear of the route sign (its right edge is x = -7.96).
+      { position: [-6.1, 3.1, -1.05], circuit: [-7.3, 2.15, -2.24], normal: [0, 0, 1], size: 1.45, panel: 1, yaw: .2, hand: 'left_hand', offset: 0 },
       { position: [-20.1, 3.15, -1.05], circuit: [-19.2, 2.15, -2.24], normal: [0, 0, 1], size: 1.85, panel: 1, yaw: -.22, hand: 'right_hand', offset: 4.1 },
-      { position: [15.3, 3.15, -1.05], circuit: [14.4, 2.15, -2.24], normal: [0, 0, 1], size: 1.85, panel: 1, yaw: -.3, hand: 'right_hand', offset: 7.3 },
+      { position: [-25.3, 3.15, -1.05], circuit: [-24, 2.15, -2.24], normal: [0, 0, 1], size: 1.85, panel: 1, yaw: -.3, hand: 'right_hand', offset: 7.3 },
       { position: [7.25, 3.3, -1.85], circuit: [5.14, 2.3, -3.18], normal: [1, 0, 0], size: 1.45, panel: 0, yaw: -.45, hand: 'right_hand', offset: 2.2 },
     ];
     for (const [i, config] of stations.entries()) {
@@ -226,7 +235,7 @@ export class BackgroundCompanions {
     this.flyer.update(0);
     this.flyer.root.updateMatrixWorld(true);
     const standingBox = new THREE.Box3().setFromObject(this.flyer.root, true);
-    this.perch = v(-4.7, 14.14 - standingBox.min.y + .012, -3.35);
+    this.perch = v(-4.7, 15.32 - standingBox.min.y + .012, -3.65);
     this.flightCurve = new THREE.CatmullRomCurve3([
       this.perch.clone(), this.perch.clone().add(v(4, 2, 1)),
       v(-22, 15.4, -21), v(-12, 12.2, -13), v(3, 11.8, -10),
@@ -243,11 +252,10 @@ export class BackgroundCompanions {
     }
     const raikouActor = new CompanionActor(prepareRaikou(assets['243']), '雷公 / rear clearing patrol', 5.85);
     this.group.add(raikouActor.root);
-    this.raikou = new RaikouCompanion(raikouActor);
+    this.raikou = new RaikouCompanion(raikouActor, this.scene.getObjectByName('Background / luminous energy charging pillar'));
     this.ready = true;
     this.update(0);
-    // Load this larger distant actor separately, after the existing companions
-    // are already alive. Its unused attack clips are omitted from this asset.
+    // Stage the heavier actors behind the loading screen to bound decode memory.
     const [reshiramAsset, skillClips] = await Promise.all([
       loader.loadAsync('/assets/companions/643.glb'),
       fetch('/assets/companions/reshiram-skill-clips.json').then(response => {
@@ -272,9 +280,11 @@ export class BackgroundCompanions {
     this.reshiram = new ReshiramCompanion(reshiramActor);
     this.reshiram.update(0);
     await this.loadWildlife(loader, legendSize);
+    if (this.loadErrors.length) throw new Error(`场景宝可梦加载失败：${this.loadErrors.join('、')}`);
+    this.fullyLoaded = true;
   }
 
-  // Later arrivals: each loads independently, so one missing model never blocks the rest.
+  // Load independently, then report failures before revealing an incomplete scene.
   async loadWildlife(loader, legendSize) {
     const tune = asset => {
       asset.scene.traverse(mesh => {
@@ -288,6 +298,7 @@ export class BackgroundCompanions {
     };
     const load = (id, name) => loader.loadAsync(`/assets/pokemon-v5/${id}.glb`).then(tune).catch(error => {
       console.warn(`${name} (${id}.glb) is not in the capsule machine yet — run scripts/sync-collection.mjs.`, error?.message || error);
+      this.loadErrors.push(name);
       return null;
     });
     this.wanderers = [];
@@ -353,7 +364,10 @@ export class BackgroundCompanions {
       const actor = new CompanionActor(asset, '梦幻 / unexpected psychic visitor', 2.2 * .75, false, '20000_defaultwait01');
       this.group.add(actor.root);
       this.mew = new MewVisitor(actor, { scene: this.scene, parent: this.group, machine: this.machine, camera: this.camera });
-    }).catch(error => console.warn('Mew visitor could not load:', error)));
+    }).catch(error => {
+      this.loadErrors.push('梦幻');
+      console.warn('Mew visitor could not load:', error);
+    }));
     await Promise.all(pending);
   }
 

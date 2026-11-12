@@ -1,6 +1,8 @@
 import { mobilePerformance } from './mobile-performance.js';
 import { extendConveyor } from './extended-conveyor.js';
+import { replaceMainSign } from './neon-sign.js';
 import { batchChamberBalls } from './chamber-batching.js';
+import { batchRigidSiblings } from './static-batching.js';
 import { installNextPokemonPanel } from './next-pokemon-panel.js';
 import './style.css';
 import './ui-refinements.css';
@@ -14,7 +16,6 @@ import { FocusExperience } from './focus.js';
 import { uprightBallQuaternion } from './ball-controls.js';
 import { CardStore } from './cards.js';
 import { findAllByKey, instantiateBall, loadManifest } from './assets.js';
-import { initializePhysics, CapsulePhysics } from './physics.js';
 import { applyBlenderLighting } from './scene-lighting.js';
 import { refineSceneMaterials } from './scene-materials.js';
 import { BoxInteraction } from './box-interaction.js';
@@ -115,13 +116,15 @@ const store = new CardStore({
   },
 });
 
-const yieldLoadingFrame = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+// Embedded preview tabs may suspend RAF while loading. Yield without making
+// scene initialization depend on a compositor frame that may never arrive.
+const yieldLoadingFrame = () => new Promise(resolve => setTimeout(resolve, 16));
 
 async function initialize() {
   let completed = 0;
-  const setProgress = value => {
+  const setProgress = (value, detail = '') => {
     loadingProgress.style.width = `${value}%`;
-    loadingDetail.textContent = `NOW LOADING... ${value}%`;
+    loadingDetail.textContent = detail || `NOW LOADING... ${value}%`;
     loadingProgress.parentElement.setAttribute('aria-valuenow', String(value));
   };
   const progress = (label) => {
@@ -129,11 +132,10 @@ async function initialize() {
     loadingDetail.setAttribute('aria-label', `NOW LOADING... ${label}`);
 
   };
-  const [machineAsset, ballAsset, manifest, rapier, additions, handbag, boxAsset, props, outputAnimation, chamberAnimation, supplyRoute, lighting, replacedParts, cart, pokedexAsset] = await Promise.all([
+  const [machineAsset, ballAsset, manifest, additions, handbag, boxAsset, props, outputAnimation, chamberAnimation, supplyRoute, lighting, replacedParts, cart, pokedexAsset, neonSign] = await Promise.all([
     loader.loadAsync('/assets/machine.glb').then((asset) => { progress('扭蛋机与输送轨道已就绪'); return asset; }),
     ballAssetReady.then((asset) => { progress('红白精灵球与开合结构已就绪'); return asset; }),
     loadManifest().then((data) => { progress('55 只宝可梦图鉴已就绪'); return data; }),
-    initializePhysics().then((engine) => { progress('物理碰撞系统已就绪'); return engine; }),
     loader.loadAsync('/assets/scene-v5-additions.glb'),
     loader.loadAsync('/assets/handbag-v5.glb'),
     loader.loadAsync('/assets/box-v5.glb'),
@@ -151,6 +153,7 @@ async function initialize() {
     fetch('/assets/v5-replaced-parts.json').then((response) => response.json()),
     loader.loadAsync('/assets/cart-v5.glb'),
     loader.loadAsync('/assets/pokedex.glb?v=lcd-20261105').then((asset) => { progress('宝可梦图鉴与开合机构已就绪'); return asset; }),
+    loader.loadAsync('/assets/pokemon-neon-sign.glb'),
   ].map(promise => promise.then(value => { setProgress(Math.round(++completed / 15 * 80)); return value; })));
   if (props) {
     props.scene.traverse((object) => {
@@ -158,13 +161,15 @@ async function initialize() {
     });
     scene.add(props.scene);
   }
+  // Keep the bag, its cards and the three adjacent balls together as a vignette.
+  const bagDisplayOffset = new THREE.Vector3(.6, 0, -.25);
   const floorBallPoses = [
     { position: [-4.274418354, 0.581178904, 4.587689877], quaternion: [-0.113260396, 0.171534017, 0.426957816, 0.88059932] },
     { position: [-5.5889678, 0.581178904, 4.949921131], quaternion: [0.212253377, 0.034684919, 0.014309811, 0.976494074] },
   ];
   floorBallPoses.forEach((pose, index) => {
     const ball = instantiateBall(ballAsset, 0.405);
-    ball.position.fromArray(pose.position);
+    ball.position.fromArray(pose.position).add(bagDisplayOffset);
     ball.quaternion.fromArray(pose.quaternion);
     scene.add(ball);
     const capture = new CaptureBall(ball, camera, index === 0 ? 'Bag front capture ball' : 'Floor capture ball');
@@ -190,6 +195,11 @@ async function initialize() {
   // The other balls resting on the floor share the same capture-shake interaction.
   ['Pokeball_luxury__scene_copy001', 'Pokeball_ultra__scene_copy001', 'Pokeball_luxury__scene_copy002'].forEach((name) => {
     const ball = scene.getObjectByName(name);
+    if (ball && name === 'Pokeball_luxury__scene_copy001') {
+      ball.updateWorldMatrix(true, false);
+      const moved = ball.getWorldPosition(new THREE.Vector3()).add(bagDisplayOffset);
+      ball.position.copy(ball.parent.worldToLocal(moved));
+    }
     if (ball) captureBalls.push(new CaptureBall(ball, camera, name));
   });
   installNextPokemonPanel(manifest);
@@ -208,6 +218,10 @@ async function initialize() {
   handbag.scene.traverse((object) => {
     if (object.isMesh) { object.castShadow = true; object.receiveShadow = true; }
   });
+  // The handbag file also contains a separate remote terminal fragment.
+  // Move only the original bag assembly (including its attached cards/tag).
+  const bagAssembly = handbag.scene.children.find(object => object.name === 'Empty');
+  if (bagAssembly) bagAssembly.position.add(bagDisplayOffset);
   scene.add(handbag.scene);
   await yieldLoadingFrame();
   applyBlenderLighting(scene, renderer, lighting);
@@ -220,7 +234,6 @@ async function initialize() {
     scene,
     model: machineAsset,
     ballTemplate: ballAsset,
-    physics: new CapsulePhysics(rapier),
     outputAnimation,
     chamberAnimation,
     supplyRoute,
@@ -231,6 +244,7 @@ async function initialize() {
     onOutputCollected: () => {},
   });
   extendConveyor(scene, machine);
+  replaceMainSign(scene, neonSign, renderer);
   boxInteraction = new BoxInteraction(scene, boxAsset);
   await yieldLoadingFrame();
   refineSceneMaterials(scene, renderer);
@@ -239,10 +253,6 @@ async function initialize() {
   homeView.background.copy(scene.background);
   backgroundCompanions = new BackgroundCompanions(scene, { machine, camera });
   machine.onSpinInteraction = () => backgroundCompanions?.mew?.startle();
-  const loadCompanions = () => backgroundCompanions.load().catch(error => {
-    console.error('Background companions:', error);
-    toast('背景精灵加载失败，请刷新重试');
-  });
   const debugButton = $('#supply-debug');
   const setSupplyDebug = (visible) => {
     machine.supply.setDebug(visible);
@@ -283,17 +293,29 @@ async function initialize() {
   machine.onPrizeSelected = record => focus.prepareRecord(record);
   // Compile before revealing the factory instead of stalling the first visible frame
   // each time another animated character/material arrives.
-  // Background actors arrive after the interactive factory, not on its critical path.
   chamberBatches = batchChamberBalls(machine.chamber);
   chamberBatches.update();
   machine.chamber.renderBatches = chamberBatches.batches;
-  setProgress(90);
+  batchRigidSiblings(boxInteraction.root, boxAsset.animations);
+  setProgress(80, '正在准备场景宝可梦… 0 / 12');
+  await backgroundCompanions.load({
+    onProgress: (completed, total) => setProgress(80 + Math.round(completed / total * 12),
+      `正在准备场景宝可梦… ${completed} / ${total}`),
+  });
+  backgroundCompanions.update(0);
+  setProgress(93, '正在准备宝可梦材质与光影…');
+  await yieldLoadingFrame();
   await prepareMainScene();
-  setProgress(96);
+  setProgress(97, '正在准备精灵球…');
   await focus.warmupBall();
+  setProgress(98, '正在生成完整场景…');
+  await yieldLoadingFrame();
+  // Upload character textures/bones and warm the shadow, reflection and post-FX
+  // passes under the loading screen, before the first interactive frame.
+  renderMainScene();
+  await yieldLoadingFrame();
   renderMainScene();
   sceneReady = true;
-  setTimeout(loadCompanions, 1200);
   bindMachinePointer();
   loadingProgress.style.width = '100%';
   loadingProgress.parentElement.setAttribute('aria-valuenow', '100');

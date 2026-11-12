@@ -3,6 +3,27 @@ import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { addNightStars } from './night-stars.js';
 
+// A light cookie, not a surface decal: the same window pattern projects onto
+// every surface and is occluded by the machine's real shadow map.
+function createWindowLightCookie() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, 512, 512);
+  ctx.save();
+  ctx.translate(256, 256);
+  ctx.rotate(-.4);
+  ctx.filter = 'blur(3px)';
+  ctx.fillStyle = '#fff';
+  for (const x of [-208, -120, -32, 56, 144]) ctx.fillRect(x, -224, 62, 448);
+  ctx.restore();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.name = 'Soft window light bands';
+  texture.colorSpace = THREE.NoColorSpace;
+  return texture;
+}
+
 export function applyBlenderLighting(scene, renderer, settings) {
   scene.children.filter((object) => object.isLight).forEach((light) => light.removeFromParent());
   const worldColor = new THREE.Color().setRGB(...settings.worldColor, THREE.LinearSRGBColorSpace);
@@ -23,8 +44,8 @@ export function applyBlenderLighting(scene, renderer, settings) {
     if (config.type === 'AREA') {
       const width = config.size || 1;
       const height = config.name === 'Glass highlight ribbon' ? .65 : config.shape === 'DISK' ? width : config.sizeY || width;
-      const balance = { 'Warm key softbox': 1.1, 'Cream frontal fill': .55,
-        'Golden upper rim': 1.05, 'Soft rear factory light': .7,
+      const balance = { 'Warm key softbox': .32, 'Cream frontal fill': .32,
+        'Golden upper rim': .66, 'Soft rear factory light': .7,
         'Apricot cyclorama wash': .75, 'Glass highlight ribbon': .5 };
       const intensity = config.energy / (width * height * Math.PI) * 0.14 * (balance[config.name] ?? 1);
       light = new THREE.RectAreaLight(color, intensity, width, height);
@@ -39,7 +60,8 @@ export function applyBlenderLighting(scene, renderer, settings) {
 
   const key = settings.lights.find((light) => light.name === 'Warm key softbox');
   if (key) {
-    const shadow = new THREE.DirectionalLight('#fff0d8', 1.9);
+    const shadow = new THREE.DirectionalLight('#fff0d8', .35);
+    shadow.name = 'Soft ambient key shadows';
     shadow.position.fromArray(key.position);
     shadow.target.position.copy(shadow.position).add(new THREE.Vector3().fromArray(key.direction));
     shadow.castShadow = true;
@@ -53,23 +75,25 @@ export function applyBlenderLighting(scene, renderer, settings) {
   }
 
   // A broad local portrait softbox lifts the machine without flattening the factory.
-  const heroFill = new THREE.RectAreaLight('#fff6e8', 5.2, 8, 10);
+  const heroFill = new THREE.RectAreaLight('#e1ebff', .8, 8, 10);
   heroFill.name = 'Hero portrait softbox';
   heroFill.position.set(5, 7, 10);
   heroFill.lookAt(0, 4, 0);
   scene.add(heroFill);
 
   // Dedicated feathered key: keeps illumination concentrated on the gacha machine.
-  const heroSpot = new THREE.SpotLight('#fff1e0', 520, 32, .56, .85, 2);
+  const heroSpot = new THREE.SpotLight('#ffdfad', 1800, 48, .58, .45, 2);
   heroSpot.name = 'Gacha dedicated warm-white spotlight';
-  heroSpot.position.set(-3.5, 12, 9);
-  heroSpot.target.position.set(0, 4.2, 0);
+  heroSpot.position.set(-8, 12, 10);
+  heroSpot.target.position.set(0, 2.8, .8);
+  heroSpot.map = createWindowLightCookie();
   heroSpot.castShadow = true;
   heroSpot.shadow.mapSize.set(mobilePerformance ? 1024 : 2048, mobilePerformance ? 1024 : 2048);
   heroSpot.shadow.camera.near = .5;
-  heroSpot.shadow.camera.far = 32;
+  heroSpot.shadow.camera.far = 48;
   heroSpot.shadow.bias = -.00015;
   heroSpot.shadow.normalBias = .015;
+  heroSpot.shadow.radius = 2;
   scene.add(heroSpot, heroSpot.target);
 }
 

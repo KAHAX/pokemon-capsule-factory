@@ -106,16 +106,18 @@ export function createGalaxySky({ texture, frame, fogColor, time }) {
         vec3 mid = vec3(.015, .028, .070);
         vec3 sky = mix(mid, zenith, smoothstep(.05, .7, h));
         // The horizon value equals the fog colour, so the far ground melts into the sky.
-        float horizonGlow = exp(-max(h, 0.0) * 4.0);
+        // Flat derivative at the horizon: no crease when the view crosses eye level.
+        float aboveHorizon = max(h, 0.0);
+        float horizonGlow = exp(-4.0 * aboveHorizon * aboveHorizon / (aboveHorizon + .045));
         sky = mix(sky, horizonColor, horizonGlow);
         sky += horizonColor * .25 * exp(-pow((h - .08) / .10, 2.0)) * smoothstep(0.0, .08, h);
         vec3 color = sky + galaxy * galaxyGain * smoothstep(.0, .22, h);
 
         // Thin aurora-like veil low on the horizon for a dreamy edge.
         float veil = dsFbm(vec2(atan(dir.z, dir.x) * 3.0 + dsTime * .01, h * 6.0));
-        color += vec3(.10, .45, .55) * pow(veil, 3.0) * exp(-max(h, 0.0) * 14.0) * .22 * step(0.0, h);
-
-        if (h < 0.0) color = horizonColor;
+        // The old step(0,h) switched this veil on instantly, leaving a horizontal
+        // stripe even behind the mist. Fade the radiance, not just the geometry.
+        color += vec3(.10, .45, .55) * pow(veil, 3.0) * exp(-aboveHorizon * 14.0) * .22 * smoothstep(0.0, .085, h);
         // Alpha 0 marks open sky for the light-shaft pass (opaque material: no blending).
         gl_FragColor = vec4(color, 0.0);
         #include <tonemapping_fragment>

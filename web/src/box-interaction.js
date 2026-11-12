@@ -10,7 +10,17 @@ export class BoxInteraction {
         object.receiveShadow = true;
       }
     });
-    scene.add(this.root);
+    // Place outside the platform. Transform a parent so authored lid animation
+    // and its local pivots remain unchanged at the larger display size.
+    this.root.updateMatrixWorld(true);
+    const bounds = new THREE.Box3().setFromObject(this.root);
+    const center = bounds.getCenter(new THREE.Vector3());
+    this.placement = new THREE.Group();
+    this.placement.name = 'Question box / right ground placement';
+    this.placement.scale.setScalar(1.5);
+    this.placement.position.set(9.2 - center.x * 1.5, -.69 - bounds.min.y * 1.5, .4 - center.z * 1.5);
+    this.placement.add(this.root);
+    scene.add(this.placement);
     this.mixer = new THREE.AnimationMixer(this.root);
     this.actions = asset.animations.map((clip) => {
       const action = this.mixer.clipAction(clip);
@@ -49,3 +59,4 @@ export class BoxInteraction {
     }
   }
 }
+

@@ -94,21 +94,19 @@ export function refineSceneMaterials(scene, renderer) {
       }
     }
     if (object.isMesh && object.name.toLowerCase().replace(/[^a-z]/g, '').includes('raisedfrontquestionplate')) {
-      // Match the pipe's polished steel (.95 metalness / .14 roughness),
-      // with slightly brighter silver and a softer highlight on the broad face.
-      // Clone only this plate: its source aluminium is shared with other parts.
-      const steelFace = source => {
+      // Red enamel over metal; isolate it from the shared aluminium trim.
+      const redFace = source => {
         const material = source.clone();
-        material.name = 'Question box / bright polished steel faceplate';
-        material.color.setRGB(.78, .83, .86);
-        material.metalness = .95;
-        material.roughness = .18;
+        material.name = 'Question box / red enamel metal faceplate';
+        material.color.set('#c63830');
+        material.metalness = .35;
+        material.roughness = .28;
         material.envMapIntensity = 1.0;
         material.emissive.set(0x000000);
         material.emissiveIntensity = 0;
         return material;
       };
-      object.material = Array.isArray(object.material) ? object.material.map(steelFace) : steelFace(object.material);
+      object.material = Array.isArray(object.material) ? object.material.map(redFace) : redFace(object.material);
     }
     if (!object.isMesh || !object.name.toLowerCase().replace(/[^a-z]/g, '').includes('frontivoryquestion')) return;
     object.material = Array.isArray(object.material)

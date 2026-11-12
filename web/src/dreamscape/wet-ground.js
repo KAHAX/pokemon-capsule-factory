@@ -137,17 +137,26 @@ export function createWetGround({ renderer, camera, time, center, groundY, size 
           outgoingLight += vec3(.75, .88, 1.0) * glint * 2.2 * dsDamp * (1.0 - dsPuddle) * (1.0 - smoothstep(14.0, 34.0, length(vViewPosition)));
         }
         #include <opaque_fragment>`)
-      .replace('#include <fog_fragment>', `#include <fog_fragment>
+      .replace('#include <fog_fragment>', '')
+      .replace('#include <tonemapping_fragment>', `#include <fog_fragment>
         {
           // Dissolve the ground into the sky's horizon colour by viewing angle, so the far
           // ground and the sky meet without any visible skyline.
           vec3 dsLook = normalize(dsWorld - cameraPosition);
           // Distance term covers the far clip plane edge, the angle term the skyline itself.
           float dsHaze = max(1.0 - smoothstep(0.0, .22, -dsLook.y), smoothstep(34.0, 85.0, length(dsWorld - cameraPosition)));
-          gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, dsHaze * dsHaze * (3.0 - 2.0 * dsHaze));
-        }`);
+          dsHaze = dsHaze * dsHaze * (3.0 - 2.0 * dsHaze);
+          // The ground also melts into the haze with distance from the stage, reaching the
+          // pure horizon colour before the mist wall (radius 72) — so the foot of the mist
+          // never shows as an edge, wherever the camera stands.
+          float dsOut = smoothstep(26.0, 66.0, length(dsWorld.xz - dsCenter));
+          dsHaze = max(dsHaze, dsOut * dsOut * (3.0 - 2.0 * dsOut) * .35 + dsOut * .65);
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, dsHaze);
+        }
+        // Match the sky in linear radiance before exposure/display conversion.
+        #include <tonemapping_fragment>`);
   };
-  material.customProgramCacheKey = () => 'dreamscape-wet-ground-v4';
+  material.customProgramCacheKey = () => 'dreamscape-wet-ground-v6-soft-mist-foot';
   reflector.material = material;
   reflector.userData.uniforms = uniforms;
   reflector.name = 'Dreamscape / wet reflective ground';

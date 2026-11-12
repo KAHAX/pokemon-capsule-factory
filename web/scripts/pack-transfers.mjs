@@ -4,10 +4,13 @@ import crypto from 'node:crypto';
 import {gzipSync,gunzipSync} from 'node:zlib';
 const root='public/assets',dir=root+'/transfer';
 await fs.mkdir(dir,{recursive:true});
-const files=['machine.glb','pokeball.glb','scene-v5-additions.glb','handbag-v5.glb','box-v5.glb','display_props.glb','output-sequence.glb','chamber-one-shot.glb','cart-v5.glb','pokedex.glb'];
+const files=['machine.glb','pokeball.glb','scene-v5-additions.glb','handbag-v5.glb','box-v5.glb','display_props.glb','output-sequence.glb','chamber-one-shot.glb','cart-v5.glb','pokedex.glb','pokemon-neon-sign.glb'];
+for(const folder of ['companions','pokemon-v5'])for(const file of await fs.readdir(root+'/'+folder)){
+ if(file.endsWith('.glb'))files.push(folder+'/'+file);
+}
 for(const f of [...files]) {
  const b=await fs.readFile(root+'/'+f),j=JSON.parse(b.subarray(20,20+b.readUInt32LE(12)).toString());
- for(const ref of j.buffers||[]) if(ref.uri && !ref.uri.startsWith('data:')) files.push(ref.uri);
+ for(const ref of j.buffers||[]) if(ref.uri && !ref.uri.startsWith('data:')) files.push(path.posix.join(path.posix.dirname(f),ref.uri));
 }
 const manifest={};let raw=0,packed=0;
 for(const file of new Set(files)) {
@@ -22,13 +25,4 @@ for(const file of new Set(files)) {
  manifest['/assets/'+file]={size:b.length,parts};raw+=b.length;
 }
 await fs.writeFile('src/transfer-manifest.json',JSON.stringify(manifest));
-// Remove only generated chunks no longer referenced by this manifest.
-const used=new Set(Object.values(manifest).flatMap(entry=>entry.parts.map(part=>path.basename(part.url))));
-const absoluteDir=path.resolve(dir);
-for(const name of await fs.readdir(absoluteDir)) {
- if(!/^[a-f0-9]{24}\.bin$/.test(name)||used.has(name))continue;
- const target=path.resolve(absoluteDir,name);
- if(path.dirname(target)!==absoluteDir)throw Error('Unexpected transfer path');
- await fs.unlink(target);
-}
 console.log(JSON.stringify({files:Object.keys(manifest).length,raw,packed,byteExact:true}));

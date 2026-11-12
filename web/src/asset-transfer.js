@@ -1,4 +1,4 @@
-import {gunzipSync} from 'fflate';
+import {decodeAssetChunk} from './asset-decode.js';
 import manifest from './transfer-manifest.json';
 
 const states=new Map();
@@ -15,9 +15,13 @@ const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 export async function downloadPacked(url,onProgress) {
  const key=new URL(url,location.href).pathname,entry=manifest[key];
  if(!entry)return null;
- const output=new Uint8Array(entry.size);let offset=0;
- // Sequential small pieces per model; the model queue limits total parallelism.
- for(let i=0;i<entry.parts.length;i++) {
+ const output=new Uint8Array(entry.size);let completed=0,next=0;
+ const offsets=[];let total=0;
+ for(const part of entry.parts){offsets.push(total);total+=part.size;}
+ if(total!==entry.size)throw Error('模型分块清单不完整');
+ // Two independent pieces hide request latency. The shared model queue keeps
+ // this bounded to four requests on mobile, six on desktop.
+ async function downloadPart(i) {
   const part=entry.parts[i];let result;
   for(let attempt=0;attempt<3;attempt++) {
    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),30000);
@@ -26,7 +30,7 @@ export async function downloadPacked(url,onProgress) {
     if(!response.ok)throw Error(`HTTP ${response.status}`);
     const bytes=new Uint8Array(await response.arrayBuffer());
     if(bytes.length!==part.bytes)throw Error('下载数据不完整');
-    result=gunzipSync(bytes);
+    result=await decodeAssetChunk(bytes);
     if(result.length!==part.size)throw Error('解压校验失败');
     break;
    } catch(error) {
@@ -35,10 +39,13 @@ export async function downloadPacked(url,onProgress) {
     await delay(500*(attempt+1));
    } finally {clearTimeout(timeout);}
   }
-  output.set(result,offset);offset+=result.length;
-  onProgress?.(`下载 ${(offset/1048576).toFixed(1)}/${(entry.size/1048576).toFixed(1)} MB`);
+  output.set(result,offsets[i]);completed+=result.length;
+  onProgress?.(`下载 ${(completed/1048576).toFixed(1)}/${(entry.size/1048576).toFixed(1)} MB`);
   await delay(0);
  }
+ await Promise.all(Array.from({length:Math.min(2,entry.parts.length)},async()=>{
+  while(next<entry.parts.length)await downloadPart(next++);
+ }));
  return output.buffer;
 }
 export async function loadPackedModel(url,makeLoader) {
@@ -60,6 +67,13 @@ export async function loadPackedModel(url,makeLoader) {
   status('解析模型与贴图');await delay(0);
   const loader=makeLoader();
   loader.manager.setURLModifier(uri=>blobs.get(new URL(uri,location.href).pathname)||uri);
-  return await loader.parseAsync(data,base.href);
+  let timeout, slow;
+  try {
+   slow=setTimeout(()=>status('贴图解码较慢，仍在处理中…'),8000);
+   return await Promise.race([
+    loader.parseAsync(data,base.href),
+    new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error(`${name} 的贴图解码超时，请点击重新加载`)),45000);}),
+   ]);
+  } finally {clearTimeout(timeout);clearTimeout(slow);}
  } finally {for(const blob of blobs.values())URL.revokeObjectURL(blob);display(key,null);}
 }

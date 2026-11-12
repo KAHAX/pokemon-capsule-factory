@@ -25,9 +25,15 @@ npm run dev
 
 ## Large models
 
-Cloudflare Pages allows assets up to 25 MiB. Larger GLB files have been losslessly repackaged as GLB JSON containers with external `.buffer-XX.bin` files, each below 20 MiB. Keep each GLB and its adjacent buffers together. Three.js GLTFLoader supports this format directly; no runtime loader changes are required.
+The current release uses compressed, content-addressed model chunks listed in `web/src/transfer-manifest.json`. All referenced chunks are published, and the loader reconstructs each model before parsing it. Raw model files remain available below the Pages 25 MiB limit. The unused original `scene-v5.glb`, local backups, and obsolete transfer chunks are excluded from publication.
 
-`publication-audit.json` records the original SHA-256 and the byte-for-byte verification of all repackaged buffer views. Materials, images, meshes, skeletons and animation data have not been reduced or recompressed.
+Unused Pokémon animation clips have been removed while preserving the clips used by the scene and collection viewer. Earlier audit reports in the repository describe earlier releases.
+
+## Current behavior
+
+- Wait for the ordinary scene Pokémon and initial rendering before revealing the factory.
+- Default shiny prize probability: 50%; the former saved 10% default is migrated once.
+- Random shiny scene visitors and the shiny Mew replacement are removed. Ordinary Mew behavior and shiny capsule prizes remain available.
 
 The original development project is separate from this publication copy. Future edits must be copied or committed here deliberately before redeploying.
 

@@ -37,12 +37,14 @@ export const RESHIRAM_LAYOUT = {
   descent: [[-6, 19, -48], [-15, 8, -53], [-17, 2, -57]],
 };
 export const ZEKROM_LAYOUT = {
-  a: [-41, G, -50], b: [-48, G, -60],
-  outward: [[-37, G, -54], [-40, G, -61]],
-  home: [[-54, G, -57], [-51, G, -50]],
-  ascent: [[-52, 3, -64], [-56, 14, -69], [-57, 31, -73]],
+  // Stay inside the 72-unit horizon mist ring, with room for the full body,
+  // wings and tail. Keep the ground loop in its separate left-hand clearing.
+  a: [-31, G, -29], b: [-37, G, -37],
+  outward: [[-27, G, -32], [-30, G, -38]],
+  home: [[-42, G, -34], [-39, G, -28]],
+  ascent: [[-39, 3, -39], [-43, 16, -43], [-57, 31, -73]],
   sky: [[-57, 31, -73], [-69, 41, -78], [-80, 46, -68], [-76, 42, -54], [-63, 33, -50]],
-  descent: [[-59, 21, -50], [-55, 9, -54], [-49, 2, -58]],
+  descent: [[-49, 25, -43], [-41, 12, -39], [-38, 2, -37]],
 };
 
 export class ReshiramCompanion {

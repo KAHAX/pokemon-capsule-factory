@@ -204,7 +204,10 @@ export function createHorizonMist({ center, fogColor, time, radius = 72 }) {
         float top = 15.0 + drift * 9.0;
         float alpha = 1.0 - smoothstep(5.0, top, vWorld.y);
         alpha = pow(alpha, 1.35);
-        vec3 c = fogColor * (1.0 + .28 * drift + .18 * exp(-pow((vWorld.y - 8.0) / 6.0, 2.0)));
+        // At its foot the mist is exactly the horizon colour the ground fades to, so the two
+        // meet without a line; the drifting brightness only builds up above the ground.
+        float lift = smoothstep(-.7, 7.0, vWorld.y);
+        vec3 c = fogColor * (1.0 + lift * (.28 * drift + .18 * exp(-pow((vWorld.y - 8.0) / 6.0, 2.0))));
         gl_FragColor = vec4(c, alpha);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>

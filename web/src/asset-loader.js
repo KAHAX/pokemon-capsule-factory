@@ -18,11 +18,11 @@ export function createAssetLoader() {
   const makeLoader = () => {
     const manager = new LoadingManager();
     const loader = new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder);
-    // Use the mature HTML image decoder in embedded mobile browsers. Some
-    // WebViews expose createImageBitmap but fail to settle large texture jobs.
-    if (matchMedia('(pointer: coarse)').matches) loader.register(parser => {
+    // Desktop embedded browsers can expose createImageBitmap yet leave a decode
+    // pending indefinitely too. Use the same tested HTML decoder on every device.
+    loader.register(parser => {
       parser.textureLoader = new TextureLoader(manager).setCrossOrigin('anonymous');
-      return {name:'MobileTextureCompatibility'};
+      return {name:'TextureDecodeCompatibility'};
     });
     return loader;
   };

@@ -28,11 +28,14 @@ function skinEnvelope(mesh) {
   const { position, skinIndex, skinWeight } = mesh.geometry.attributes;
   if (!skinIndex || !skinWeight) return null;
   const boxes = new Map(), p = new THREE.Vector3(), local = new THREE.Vector3();
+  // r160 has getX/Y/Z/W, but not BufferAttribute.getComponent. These also
+  // decode normalized/interleaved attributes emitted by the asset optimizer.
+  const components = ['getX', 'getY', 'getZ', 'getW'];
   for (let i = 0; i < position.count; i++) {
     p.fromBufferAttribute(position, i).applyMatrix4(mesh.bindMatrix);
     for (let j = 0; j < 4; j++) {
-      if (skinWeight.getComponent(i, j) <= 0) continue;
-      const index = skinIndex.getComponent(i, j);
+      if (skinWeight[components[j]](i) <= 0) continue;
+      const index = skinIndex[components[j]](i);
       if (!boxes.has(index)) boxes.set(index, new THREE.Box3());
       local.copy(p).applyMatrix4(mesh.skeleton.boneInverses[index]);
       boxes.get(index).expandByPoint(local);

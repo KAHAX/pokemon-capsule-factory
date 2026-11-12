@@ -1,4 +1,5 @@
 import { mobilePerformance, MobileResolutionBudget } from './mobile-performance.js';
+import { scenePixelRatio } from './render-budget.js';
 import { companionOutlines } from './companion-rendering.js';
 import { createSceneToon } from './scene-toon.js';
 import * as THREE from 'three';
@@ -17,10 +18,10 @@ export function createMainScene(container) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#6f5c50');
   scene.fog = new THREE.Fog('#6f5c50', 80, 180);
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(mobilePerformance ? Math.min(window.devicePixelRatio || 1, mobileBudget.ratio) : window.innerWidth < 800
-    ? Math.min(window.devicePixelRatio, 1.5)
-    : Math.min(Math.max(window.devicePixelRatio, 1.25), 2));
+  // MSAA lives on the composer's target. The canvas only receives a fullscreen
+  // triangle, so a second multisampled canvas spends memory without smoothing edges.
+  const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(scenePixelRatio(container.clientWidth, container.clientHeight, window.devicePixelRatio || 1, mobilePerformance ? mobileBudget.ratio : null));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.08;
@@ -31,8 +32,8 @@ export function createMainScene(container) {
   scene.environment = createStudioEnvironment(renderer, { hero: true });
 
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000); // include the distant Rayquaza patrol
-  camera.position.set(11.4, 9.8, 18.2);
-  const baseTarget = new THREE.Vector3(0, 5.0, 0);
+  camera.position.set(15.96, 13.22, 25.48);
+  const baseTarget = new THREE.Vector3(0, 6.5, 0);
   camera.lookAt(baseTarget);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.copy(baseTarget);
@@ -161,7 +162,7 @@ export function createMainScene(container) {
     const height = container.clientHeight;
     if (!width || !height) return;
     const dpr = window.devicePixelRatio || 1;
-    const pixelRatio = mobilePerformance ? Math.min(dpr, mobileBudget.ratio) : width < 800 ? Math.min(dpr, 1.5) : Math.min(Math.max(dpr, 1.25), 2);
+    const pixelRatio = scenePixelRatio(width, height, dpr, mobilePerformance ? mobileBudget.ratio : null);
     if (renderer.getPixelRatio() !== pixelRatio) renderer.setPixelRatio(pixelRatio);
     camera.aspect = width / height;
     // Preserve the desktop view and keep the same horizontal room on narrow screens.
