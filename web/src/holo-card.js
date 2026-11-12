@@ -1,4 +1,5 @@
 import { playCardRecall } from './card-recall.js';
+import { mobileEdition } from './mobile-performance.js';
 import { prepareCardSurface } from './card-surface.js';
 import * as THREE from 'three';
 import { PokemonCardScene } from './card/pokemon-card-scene.js';
@@ -61,6 +62,7 @@ class AdoptedCardScene extends PokemonCardScene {
 
   adoptModel(model, mixer) {
     this.clearModel();
+    this.updateModelEffects = model.userData.updateEffects;
     this.model = new THREE.Group();
     this.model.position.set(0, 0, -this.modelDepth);
     this.scene.add(this.model);
@@ -109,6 +111,7 @@ class AdoptedCardScene extends PokemonCardScene {
   resize() { super.resize(); this.fitModel(); }
 
   updatePortraitView(delta) {
+    if (mobileEdition) this.updateModelEffects?.(this.elapsed);
     const desired = getDisplaySettings();
     this.displaySettings.parallaxDepth = THREE.MathUtils.damp(this.displaySettings.parallaxDepth, desired.parallaxDepth, 10, delta);
     this.displaySettings.modelScale = THREE.MathUtils.damp(this.displaySettings.modelScale, desired.modelScale, 10, delta);
@@ -196,7 +199,7 @@ function performOccasionally(mixer, idle, clips) {
 }
 
 export class HoloCard {
-  constructor(container, entry, model, animation) {
+  constructor(container, entry, model, animation, { manualPreview = false } = {}) {
     this.entry = entry;
     this.element = document.createElement('div');
     this.element.className = 'holo-card-host';
@@ -235,6 +238,7 @@ export class HoloCard {
     }
     this.scene = new AdoptedCardScene(this.cardElement, this.element.querySelector('.card-viewport'));
     this.scene.character = character;
+    this.scene.externallyDriven = manualPreview;
     this.scene.init();
     const mixer = new THREE.AnimationMixer(model);
     const idle = animation ? mixer.clipAction(animation).play() : null;
@@ -296,19 +300,21 @@ export class HoloCard {
     this.positioner.style.transform = `translate(-50%, -50%) perspective(900px) scale(${1 - eased * 0.94}) rotateY(${yaw}deg) rotateX(${10 * Math.sin(Math.PI * t)}deg) rotateZ(${-12 * eased}deg)`;
   }
 
-  captureCanvas() {
+  captureCanvas({ preview = false, delta = 0 } = {}) {
     const scene = this.scene;
-    scene.studioEffect.render(scene.scene, scene.camera, { rainbow: this.entry.shiny, time: scene.elapsed });
+    if (scene.externallyDriven) scene.renderFrame(delta);
+    else scene.studioEffect.render(scene.scene, scene.camera, { rainbow: this.entry.shiny, time: scene.elapsed });
     const canvas = this.captureSurface ||= document.createElement('canvas');
-    const targetWidth = this.cardSurface ? Math.round(this.cardSurface.width * 2) : 600;
-    const targetHeight = this.cardSurface ? Math.round(this.cardSurface.height * 2) : 850;
+    const scale = preview && mobileEdition ? 1 : 2;
+    const targetWidth = this.cardSurface ? Math.round(this.cardSurface.width * scale) : 600;
+    const targetHeight = this.cardSurface ? Math.round(this.cardSurface.height * scale) : 850;
     if (canvas.width !== targetWidth || canvas.height !== targetHeight) { canvas.width = targetWidth; canvas.height = targetHeight; }
     const context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (this.cardSurface) {
       const f = this.cardSurface;
 
-      context.setTransform(2, 0, 0, 2, 0, 0);
+      context.setTransform(scale, 0, 0, scale, 0, 0);
       context.drawImage(f.frame, 0, 0, f.width, f.height);
       context.save(); context.beginPath(); context.roundRect(f.x, f.y, f.w, f.h, 4); context.clip();
       context.drawImage(scene.renderer.domElement, f.x, f.y, f.w, f.h);

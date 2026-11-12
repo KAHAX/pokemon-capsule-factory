@@ -9,10 +9,11 @@ import {MeshoptEncoder,MeshoptDecoder} from 'meshoptimizer';
 
 await Promise.all([MeshoptEncoder.ready,MeshoptDecoder.ready]);
 const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.encoder':MeshoptEncoder,'meshopt.decoder':MeshoptDecoder});
-const files=['machine.glb','pokeball.glb','scene-v5-additions.glb','handbag-v5.glb','box-v5.glb','display_props.glb','output-sequence.glb','chamber-one-shot.glb','cart-v5.glb','pokedex.glb','pokemon-neon-sign.glb','companions/081.glb','companions/587.glb','pokemon-v5/025.glb'];
+const companions=['companions/081.glb','companions/311.glb','companions/312.glb','companions/587.glb','companions/243.glb','companions/643.glb','companions/151.glb','pokemon-v5/644.glb','pokemon-v5/025.glb','pokemon-v5/135.glb','pokemon-v5/104.glb','pokemon-v5/384.glb'];
+const files=['machine.glb','pokeball.glb','scene-v5-additions.glb','handbag-v5.glb','box-v5.glb','display_props.glb','output-sequence.glb','chamber-one-shot.glb','cart-v5.glb','pokedex.glb','pokemon-neon-sign.glb',...companions];
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
 const geometry=d=>d.getRoot().listMeshes().map(m=>({name:m.getName(),primitives:m.listPrimitives().map(p=>({indices:p.getIndices()?hash(Buffer.from(p.getIndices().getArray().buffer,p.getIndices().getArray().byteOffset,p.getIndices().getArray().byteLength)):null,attributes:p.listSemantics().map(k=>[k,hash(Buffer.from(p.getAttribute(k).getArray().buffer,p.getAttribute(k).getArray().byteOffset,p.getAttribute(k).getArray().byteLength))])}))}));
-const selected=process.argv[2]?[process.argv[2]]:files;
+const selected=process.argv[2]==='--companions'?companions:process.argv[2]?[process.argv[2]]:files;
 const manifest=process.argv[2]?JSON.parse(await fs.readFile('src/mobile-transfer-manifest.json')):{};
 const report=process.argv[2]?JSON.parse(await fs.readFile('../mobile-assets-report.json')).filter(row=>!selected.includes(row.file)):[];
 await fs.mkdir('public/assets/mobile',{recursive:true});

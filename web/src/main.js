@@ -22,7 +22,6 @@ import { refineSceneMaterials } from './scene-materials.js';
 import { BoxInteraction } from './box-interaction.js';
 import { CaptureBall } from './capture-ball.js';
 import { BackgroundCompanions } from './background-companions.js';
-import { MobileCompanions } from './mobile-companions.js';
 import { createMobileSupplyBatches } from './mobile-supply-batches.js';
 import { PokedexPack } from './pokedex-pack.js';
 import { LoadingBall } from './loading-ball.js';
@@ -267,7 +266,7 @@ async function initialize() {
     useMobileGlass(scene);
   }
   homeView.background.copy(scene.background);
-  backgroundCompanions = mobileEdition ? new MobileCompanions(scene) : new BackgroundCompanions(scene, { machine, camera });
+  backgroundCompanions = new BackgroundCompanions(scene, { machine, camera });
   machine.onSpinInteraction = () => backgroundCompanions?.mew?.startle();
   const debugButton = $('#supply-debug');
   const setSupplyDebug = (visible) => {
@@ -318,12 +317,13 @@ async function initialize() {
     // Merge only static siblings; crank action roots and animated pivots stay separate.
     for (const asset of [machineAsset, additions, handbag, cart, props].filter(Boolean)) batchRigidSiblings(asset.scene, asset.animations);
   }
-  setProgress(80, `正在准备场景宝可梦… 0 / ${mobileEdition ? 3 : 12}`);
+  setProgress(80, '正在准备场景宝可梦… 0 / 12');
   await backgroundCompanions.load({
     onProgress: (completed, total) => setProgress(80 + Math.round(completed / total * 12),
       `正在准备场景宝可梦… ${completed} / ${total}`),
   });
   backgroundCompanions.update(0);
+  if (mobileEdition) backgroundCompanions.group.traverse(object => { if (object.isMesh) object.castShadow=false; });
   setProgress(93, '正在准备宝可梦材质与光影…');
   await yieldLoadingFrame();
   await prepareMainScene();

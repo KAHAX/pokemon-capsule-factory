@@ -274,7 +274,13 @@ export class PokemonCardScene extends ParallaxCard {
   }
 
   tick() {
+    if (this.externallyDriven) return;
     const delta = Math.min(this.clock.getDelta(), 0.05);
+    this.renderFrame(delta);
+    this.frame = requestAnimationFrame(this.tick);
+  }
+
+  renderFrame(delta = 0) {
     this.elapsed += delta;
     const damping = this.reducedMotion.matches ? 1 : 1 - Math.exp(-delta * 8);
     this.current.lerp(this.target, damping);
@@ -303,7 +309,6 @@ export class PokemonCardScene extends ParallaxCard {
       this.mixer?.update(delta);
     }
     this.studioEffect.render(this.scene, this.camera, { rainbow: this.character?.shiny, time: this.elapsed });
-    this.frame = requestAnimationFrame(this.tick);
   }
 
   dispose() {

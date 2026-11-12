@@ -45,7 +45,7 @@ export class ParallaxCard {
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.viewport);
     this.resize();
-    this.frame = requestAnimationFrame(this.tick);
+    if (!this.externallyDriven) this.frame = requestAnimationFrame(this.tick);
     this.card.dataset.ready = 'true';
   }
 
@@ -252,6 +252,7 @@ export class ParallaxCard {
   }
 
   onVisibilityChange() {
+    if (this.externallyDriven) return;
     if (document.hidden) {
       cancelAnimationFrame(this.frame);
       this.frame = 0;
@@ -259,6 +260,13 @@ export class ParallaxCard {
       this.clock.getDelta();
       this.frame = requestAnimationFrame(this.tick);
     }
+  }
+
+  setExternalDriving(enabled) {
+    this.externallyDriven=enabled;
+    cancelAnimationFrame(this.frame);this.frame=0;
+    this.clock.getDelta();
+    if (!enabled && !document.hidden) this.frame=requestAnimationFrame(this.tick);
   }
 
   tick() {

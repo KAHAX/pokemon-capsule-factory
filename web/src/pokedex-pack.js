@@ -45,7 +45,9 @@ export class PokedexPack {
     this.onSelect = onSelect;
     this.onViewChange = onViewChange;
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+    // The viewer lives around z=-12. A tighter phone depth range separates the
+    // closely stacked card faces on WebViews with lower precision depth buffers.
+    this.camera = new THREE.PerspectiveCamera(35, 1, mobileEdition ? 1 : 0.1, mobileEdition ? 50 : 100);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobilePerformance ? 1 : 1.75));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -297,7 +299,8 @@ export class PokedexPack {
       image.colorSpace = THREE.SRGBColorSpace;
       image.anisotropy = 4;
       const face = new THREE.Mesh(roundedCard(3.08, 4.40, .12), new THREE.MeshBasicMaterial({ map: image, toneMapped: false }));
-      face.position.z = thickness / 2 + 0.002;
+      if (mobileEdition) { face.material.polygonOffset=true;face.material.polygonOffsetFactor=-1;face.material.polygonOffsetUnits=-2; }
+      face.position.z = thickness / 2 + (mobileEdition ? .008 : .002);
       group.add(body, face);
       this.cardStack.add(group);
       if (!depth) { this.selectedFace = face; this.selectedGroup = group; }
@@ -385,7 +388,7 @@ export class PokedexPack {
         return;
       }
       this.liveModel = loaded.model;
-      this.liveCard = new HoloCard(this.previewHost, loaded.entry, loaded.model, loaded.model.userData.cardAnimation || loaded.animation);
+      this.liveCard = new HoloCard(this.previewHost, loaded.entry, loaded.model, loaded.model.userData.cardAnimation || loaded.animation, { manualPreview: mobileEdition });
       this.liveCard.setEntrance(1);
       this.liveCard.scene.renderer.setPixelRatio(1);
       this.liveCard.scene.resize();
@@ -393,7 +396,7 @@ export class PokedexPack {
       if (token !== this.previewToken || !this.viewer) return;
       const ratio = this.liveCard.cardElement.offsetWidth / this.liveCard.cardElement.offsetHeight;
       this.cardStack.children.forEach(group => { group.scale.x = 4.48 * ratio / 3.16; });
-      this.liveTexture = new THREE.CanvasTexture(this.liveCard.captureCanvas());
+      this.liveTexture = new THREE.CanvasTexture(this.liveCard.captureCanvas({preview:true}));
       this.liveTexture.colorSpace = THREE.SRGBColorSpace;
       this.liveTexture.minFilter = THREE.LinearFilter;
       this.liveTexture.generateMipmaps = false;
@@ -476,6 +479,7 @@ export class PokedexPack {
       if (t >= 1) {
         // Hand over the same live card, preserving its model animation and avoiding a reload.
         const prepared = this.liveCard; this.liveCard = null; this.liveModel = null;
+        if (mobileEdition) prepared.scene.setExternalDriving(false);
         this.selectedGroup.removeFromParent();
         this.selectedGroup.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
         this.liveTexture?.dispose(); this.liveTexture = null;
@@ -506,9 +510,9 @@ export class PokedexPack {
     if (this.liveCard && this.liveTexture && (this.cardStack.visible || this.cardDetached)) {
       this.liveCard.scene.target.set(this.tilt.y * 1.5, -this.tilt.x * 1.5);
       this.previewClock += dt;
-      if (this.previewClock >= 1 / 20) {
-        this.previewClock = 0;
-        this.liveCard.captureCanvas();
+      if (this.previewClock >= 1 / (mobileEdition ? 15 : 20)) {
+        const delta=this.previewClock;this.previewClock = 0;
+        this.liveCard.captureCanvas({preview:true,delta});
         this.liveTexture.needsUpdate = true;
       }
     }

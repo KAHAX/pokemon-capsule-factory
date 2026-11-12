@@ -90,24 +90,6 @@
     "geometryUnchanged": true
   },
   {
-    "file": "companions/587.glb",
-    "bytes": 456760,
-    "transfer": 215248,
-    "requests": 1,
-    "imageBefore": 39392,
-    "imageAfter": 27310,
-    "geometryUnchanged": true
-  },
-  {
-    "file": "pokemon-v5/025.glb",
-    "bytes": 2806708,
-    "transfer": 1329711,
-    "requests": 2,
-    "imageBefore": 797778,
-    "imageAfter": 209974,
-    "geometryUnchanged": true
-  },
-  {
     "file": "scene-v5-additions.glb",
     "bytes": 5232872,
     "transfer": 4021695,
@@ -125,6 +107,127 @@
     "requests": 1,
     "imageBefore": 173662,
     "imageAfter": 38104,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "companions/311.glb",
+    "bytes": 601756,
+    "transfer": 316461,
+    "requests": 1,
+    "imageBefore": 503638,
+    "imageAfter": 138100,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "companions/312.glb",
+    "bytes": 639816,
+    "transfer": 309049,
+    "requests": 1,
+    "imageBefore": 476892,
+    "imageAfter": 124160,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "companions/587.glb",
+    "bytes": 456760,
+    "transfer": 215248,
+    "requests": 1,
+    "imageBefore": 39392,
+    "imageAfter": 27310,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "companions/243.glb",
+    "bytes": 1225248,
+    "transfer": 588542,
+    "requests": 1,
+    "imageBefore": 630888,
+    "imageAfter": 174252,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "companions/643.glb",
+    "bytes": 2540052,
+    "transfer": 1300996,
+    "requests": 2,
+    "imageBefore": 503130,
+    "imageAfter": 208688,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "companions/151.glb",
+    "bytes": 1274360,
+    "transfer": 457212,
+    "requests": 1,
+    "imageBefore": 127714,
+    "imageAfter": 39858,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "pokemon-v5/644.glb",
+    "bytes": 2241276,
+    "transfer": 961945,
+    "requests": 2,
+    "imageBefore": 749540,
+    "imageAfter": 166948,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "pokemon-v5/025.glb",
+    "bytes": 2806708,
+    "transfer": 1329711,
+    "requests": 2,
+    "imageBefore": 797778,
+    "imageAfter": 209974,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "pokemon-v5/135.glb",
+    "bytes": 2514552,
+    "transfer": 1127853,
+    "requests": 2,
+    "imageBefore": 515974,
+    "imageAfter": 160666,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "pokemon-v5/104.glb",
+    "bytes": 935704,
+    "transfer": 349613,
+    "requests": 1,
+    "imageBefore": 39266,
+    "imageAfter": 24710,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  },
+  {
+    "file": "pokemon-v5/384.glb",
+    "bytes": 2225976,
+    "transfer": 1175575,
+    "requests": 2,
+    "imageBefore": 410046,
+    "imageAfter": 169708,
     "geometryUnchanged": true,
     "topologyUnchanged": true,
     "precisionOnly": false

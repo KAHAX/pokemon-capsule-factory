@@ -1,0 +1,67 @@
+{
+  "actors": 29,
+  "checks": [
+    {
+      "id": "025",
+      "external": true,
+      "raf": 0,
+      "renders": 60,
+      "elapsed": 3.99999999999999,
+      "width": 348,
+      "height": 581,
+      "minAlpha": 0.9982457365315359,
+      "maxMeanJump": 0.0016428570320270452,
+      "avgMs": 7.60166666607062,
+      "depth": [
+        1,
+        50
+      ],
+      "offset": true
+    },
+    {
+      "id": "025-shiny",
+      "external": true,
+      "raf": 0,
+      "renders": 60,
+      "elapsed": 4.000000000000001,
+      "width": 348,
+      "height": 581,
+      "minAlpha": 0.9982659076133421,
+      "maxMeanJump": 0.004772064189554559,
+      "avgMs": 11.336666666467984,
+      "depth": [
+        1,
+        50
+      ],
+      "offset": true
+    },
+    {
+      "id": "006",
+      "external": true,
+      "raf": 0,
+      "renders": 60,
+      "elapsed": 4.000000000000001,
+      "width": 348,
+      "height": 565,
+      "minAlpha": 0.9981960592846464,
+      "maxMeanJump": 0.005091539965864977,
+      "avgMs": 9.359166662891706,
+      "depth": [
+        1,
+        50
+      ],
+      "offset": true
+    }
+  ],
+  "landscape": {
+    "viewer": true,
+    "external": true,
+    "texture": 348
+  },
+  "handoff": {
+    "mode": "card",
+    "external": false
+  },
+  "errors": [],
+  "limitations": "Desktop Chromium mobile emulation; Huawei/WeChat GPU behavior still requires device verification."
+}

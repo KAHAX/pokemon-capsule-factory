@@ -29,5 +29,6 @@
     "Desktop Chromium emulation is not a Huawei GPU or WeChat WebView measurement.",
     "Background cast is reduced to three species. Shadows are static and ground reflections refresh on camera movement.",
     "Phone textures use lower resolution; original meshes retain triangle counts and positions."
-  ]
+  ],
+  "revision": "f1fa9c7 (historical three-character mobile baseline)"
 }
