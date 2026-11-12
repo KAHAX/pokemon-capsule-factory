@@ -1,4 +1,4 @@
-import { mobilePerformance } from './mobile-performance.js';
+import { mobileEdition, mobilePerformance } from './mobile-performance.js';
 import { companionOutlines } from './companion-rendering.js';
 import * as THREE from 'three';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
@@ -47,11 +47,13 @@ export function createSceneToon(scene, camera, depthOfField, renderer) {
       }
     `,
   });
+  if (mobileEdition) outline.material.fragmentShader = outline.material.fragmentShader.replace(
+    'unpackRGBAToDepth(texture2D(tDepth, uv))', 'texture2D(tDepth, uv).x').replace('edge*.88', 'edge*.38');
   const baseSetSize = outline.setSize.bind(outline);
   outline.setSize = (width, height) => {
     baseSetSize(width, height);
     outline.uniforms.resolution.value.set(width, height);
-    outline.uniforms.lineWidth.value = (mobilePerformance
+    outline.uniforms.lineWidth.value = mobileEdition ? renderer.getPixelRatio() * .8 : (mobilePerformance
       ? renderer.getPixelRatio() : Math.min(window.devicePixelRatio || 1, 2)) * 2.0;
   };
   return {

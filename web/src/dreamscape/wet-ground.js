@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mobileEdition } from '../mobile-performance.js';
 import { Reflector } from 'three/addons/objects/Reflector.js';
 import { NOISE_GLSL } from './sky.js';
 
@@ -7,10 +8,10 @@ import { NOISE_GLSL } from './sky.js';
  * blurred streaky reflections on the damp stone, faint glints and a luminous stage ring.
  */
 export function createWetGround({ renderer, camera, time, center, groundY, size = 400 }) {
-  const quality = window.innerWidth < 800 ? .35 : .5;
+  const quality = mobileEdition ? .3 : window.innerWidth < 800 ? .35 : .5;
   const reflector = new Reflector(new THREE.PlaneGeometry(size, size), {
     textureWidth: 512, textureHeight: 512, clipBias: .003,
-    multisample: window.innerWidth < 800 ? 0 : 4,
+    multisample: mobileEdition || window.innerWidth < 800 ? 0 : 4,
   });
   const renderTarget = reflector.getRenderTarget();
   const textureMatrix = reflector.material.uniforms.textureMatrix.value;
@@ -171,6 +172,7 @@ export function createWetGround({ renderer, camera, time, center, groundY, size 
   // and while the camera is still the mirror refreshes at half rate.
   const mirror = reflector.onBeforeRender;
   const lastView = new THREE.Matrix4();
+  let lastReflectionTime = -Infinity;
   let frame = 0, glass = [], nextScan = 0, lastFrame = -1;
   reflector.onBeforeRender = function (r, scene, cam, ...rest) {
     if (cam !== camera || scene.overrideMaterial) return;
@@ -190,7 +192,10 @@ export function createWetGround({ renderer, camera, time, center, groundY, size 
     // Ignore imperceptible residual OrbitControls/parallax damping.
     const moved = lastView.elements.some((value, i) => Math.abs(value - cam.matrixWorld.elements[i]) > .0001);
     frame++;
-    if (!moved && !resized && frame % 2) return;
+    if (mobileEdition) {
+      if (!resized && performance.now() - lastReflectionTime < (moved ? 100 : 200)) return;
+      lastReflectionTime = performance.now();
+    } else if (!moved && !resized && frame % 2) return;
     lastView.copy(cam.matrixWorld);
     const now = performance.now();
     if (now > nextScan) {

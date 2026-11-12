@@ -1,4 +1,4 @@
-import { mobilePerformance } from './mobile-performance.js';
+import { mobileEdition, mobilePerformance } from './mobile-performance.js';
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { addNightStars } from './night-stars.js';
@@ -64,7 +64,7 @@ export function applyBlenderLighting(scene, renderer, settings) {
     shadow.name = 'Soft ambient key shadows';
     shadow.position.fromArray(key.position);
     shadow.target.position.copy(shadow.position).add(new THREE.Vector3().fromArray(key.direction));
-    shadow.castShadow = true;
+    shadow.castShadow = !mobileEdition;
     const shadowSize = mobilePerformance ? 1024 : window.innerWidth >= 800 ? Math.min(4096, renderer.capabilities.maxTextureSize) : 2048;
     shadow.shadow.mapSize.set(shadowSize, shadowSize);
     Object.assign(shadow.shadow.camera, { left: -13, right: 13, top: 16, bottom: -10, near: 1, far: 55 });

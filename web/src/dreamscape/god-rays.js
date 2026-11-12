@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mobileEdition } from '../mobile-performance.js';
 import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 
 /**
@@ -16,7 +17,7 @@ export class GodRaysPass extends Pass {
       uniforms: {
         tDiffuse: { value: null }, tDepth: { value: depthTexture },
         lightUv: { value: new THREE.Vector2(.5, 1.2) }, aspect: { value: 1 },
-        density: { value: .92 }, decay: { value: .968 }, onScreen: { value: 1 },
+        density: { value: .92 }, decay: { value: mobileEdition ? Math.pow(.968,56/24) : .968 }, onScreen: { value: 1 },
       },
       vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
       fragmentShader: /* glsl */`
@@ -25,7 +26,7 @@ export class GodRaysPass extends Pass {
         uniform vec2 lightUv;
         uniform float aspect, density, decay, onScreen;
         varying vec2 vUv;
-        const int SAMPLES = 56;
+        const int SAMPLES = ${mobileEdition ? 24 : 56};
         vec3 source(vec2 uv) {
           if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) return vec3(0.0);
                     vec2 d = (uv - lightUv) * vec2(aspect, 1.0);
@@ -81,7 +82,7 @@ export class GodRaysPass extends Pass {
   }
 
   setSize(width, height) {
-    this.raysTarget.setSize(Math.max(1, width >> 1), Math.max(1, height >> 1));
+    this.raysTarget.setSize(Math.max(1, width >> (mobileEdition ? 2 : 1)), Math.max(1, height >> (mobileEdition ? 2 : 1)));
     this.raysMaterial.uniforms.aspect.value = width / Math.max(1, height);
   }
 

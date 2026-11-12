@@ -74,7 +74,7 @@ export function installDreamscape({ scene, renderer, camera, controls, bloom, ti
   removeMiddleSigns(scene);
   scene.userData.raisedDisplays = raiseHangingDisplays(scene);
   restoreMedallionGlow(scene);
-  applyPrintedGlass(scene).catch(error => console.warn('Dreamscape glass:', error));
+  const printedGlassReady = applyPrintedGlass(scene).catch(error => console.warn('Dreamscape glass:', error));
 
   const lights = addMoonlight(scene);
 
@@ -97,7 +97,7 @@ export function installDreamscape({ scene, renderer, camera, controls, bloom, ti
   }).catch(error => console.warn('Dreamscape sky:', error));
 
   const shinyFX = new ShinyOutletFX(scene, machine);
-  const api = { ground, stars, sky, lights, shafts: [warmShaft, moonShaft], motes, dust, bloom, frame, lightDirection, shinyFX,
+  const api = { printedGlassReady, ground, stars, sky, lights, shafts: [warmShaft, moonShaft], motes, dust, bloom, frame, lightDirection, shinyFX,
     update(dt) { shinyFX.update(dt); } };
   window.__dreamscape = api;
   return api;

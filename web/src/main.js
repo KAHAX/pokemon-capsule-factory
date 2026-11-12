@@ -1,4 +1,5 @@
-import { mobilePerformance } from './mobile-performance.js';
+import { useMobileGlass } from './mobile-rendering.js';
+import { mobileEdition, mobilePerformance } from './mobile-performance.js';
 import { extendConveyor } from './extended-conveyor.js';
 import { replaceMainSign } from './neon-sign.js';
 import { batchChamberBalls } from './chamber-batching.js';
@@ -37,7 +38,14 @@ const machineStatus = $('#machine-status');
 const spinButton = $('#spin-button');
 // Start the small ball immediately, before loading the heavier factory assets.
 const ballAssetReady = createAssetLoader().loadAsync('/assets/pokeball.glb');
-const loadingBall = new LoadingBall($('#loading-ball-stage'), ballAssetReady);
+// The phone loading indicator uses CSS, avoiding a second WebGL context and
+// another studio environment while the real scene is decoding/compiling.
+const loadingBall = mobileEdition ? (() => {
+  const indicator = document.createElement('div');
+  indicator.className = 'loading-ball'; indicator.appendChild(document.createElement('i'));
+  $('#loading-ball-stage').appendChild(indicator);
+  return { dispose: () => indicator.remove() };
+})() : new LoadingBall($('#loading-ball-stage'), ballAssetReady);
 let toastTimer;
 
 function toast(message) {
@@ -245,11 +253,16 @@ async function initialize() {
   });
   extendConveyor(scene, machine);
   replaceMainSign(scene, neonSign, renderer);
+  if (mobileEdition) batchRigidSiblings(neonSign.scene, neonSign.animations);
   boxInteraction = new BoxInteraction(scene, boxAsset);
   await yieldLoadingFrame();
   refineSceneMaterials(scene, renderer);
   await yieldLoadingFrame();
   dreamscape = installDreamscape({ scene, renderer, camera, controls, bloom, time: dreamTime, machine });
+  if (mobileEdition) {
+    await dreamscape.printedGlassReady;
+    useMobileGlass(scene);
+  }
   homeView.background.copy(scene.background);
   backgroundCompanions = new BackgroundCompanions(scene, { machine, camera });
   machine.onSpinInteraction = () => backgroundCompanions?.mew?.startle();
@@ -561,6 +574,10 @@ function bindMachinePointer() {
 }
 
 spinButton?.addEventListener('click', () => {
+  if (mobileEdition && machine?.outputs.length) {
+    startFocusFlight(machine.outputs[machine.outputs.length - 1]);
+    return;
+  }
   const accepted = machine?.spin();
   if (!accepted) toast('机器当前不可扭动，请稍候或先取走出货球');
 });
@@ -628,7 +645,7 @@ function frame(dt) {
   const frozenFactory = mobilePerformance && pokedexPack?.viewer && !pokedexPack?.transition;
   if (!focus?.active && !focusFlight && !frozenFactory && !document.hidden) {
     companionFrameTime += dt;
-    if (!mobilePerformance || companionFrameTime >= .05) {
+    if (!mobilePerformance || companionFrameTime >= (mobileEdition ? .085 : .05)) {
       backgroundCompanions?.update(companionFrameTime); companionFrameTime=0;
     }
   } else companionFrameTime=0;
@@ -641,6 +658,10 @@ function frame(dt) {
   if (focusFlight) focus.renderFlightPreview(focusFlight.ball, focusFlight.outlineStrength, focusFlight.record);
   updateCrankHint();
   if (machine && spinButton) spinButton.disabled = machine.busy || focus?.active || Boolean(focusFlight);
+  if (mobileEdition && spinButton) {
+    spinButton.hidden = !sceneReady || Boolean(focus?.active || focusFlight || pokedexPack?.viewer || $('#pack-dialog').open);
+    spinButton.textContent = machine?.outputs.length ? '打开精灵球' : machine?.busy ? '正在出球…' : '扭一颗';
+  }
 }
 animate();
 

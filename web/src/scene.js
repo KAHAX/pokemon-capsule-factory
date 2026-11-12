@@ -1,4 +1,5 @@
-import { mobilePerformance, MobileResolutionBudget } from './mobile-performance.js';
+import { MobileBeautyPass, createMobileFocusPass } from './mobile-rendering.js';
+import { mobileEdition, mobilePerformance, MobileResolutionBudget } from './mobile-performance.js';
 import { scenePixelRatio } from './render-budget.js';
 import { companionOutlines } from './companion-rendering.js';
 import { createSceneToon } from './scene-toon.js';
@@ -82,21 +83,22 @@ export function createMainScene(container) {
   target.samples = !mobilePerformance && renderer.capabilities.isWebGL2 && window.innerWidth >= 800
     ? Math.min(4, renderer.capabilities.maxSamples) : 0;
   const composer = new EffectComposer(renderer, target);
-  composer.addPass(new RenderPass(scene, camera));
+  const beauty = mobileEdition ? new MobileBeautyPass(scene, camera) : new RenderPass(scene, camera);
+  composer.addPass(beauty);
   // Light shafts read the open-sky mask (alpha) straight from the beauty pass.
   const godRays = new GodRaysPass(null, camera);
   composer.addPass(godRays);
   scene.userData.dreamGodRays = godRays;
-  const depthOfField = new BokehPass(scene, camera, { focus: 25.5, aperture: 0.00065, maxblur: 0.006 });
+  const depthOfField = mobileEdition ? createMobileFocusPass(beauty, camera) : new BokehPass(scene, camera, { focus: 25.5, aperture: 0.00065, maxblur: 0.006 });
   // Keep the hero focus band and foreground softness; strengthen only the distant factory.
-  depthOfField.materialBokeh.fragmentShader = depthOfField.materialBokeh.fragmentShader.replace(
+  if (!mobileEdition) depthOfField.materialBokeh.fragmentShader = depthOfField.materialBokeh.fragmentShader.replace(
     'float factor = ( focus + viewZ );',
     'float delta = focus + viewZ; float behind = max(-delta - 5.0, 0.0); float front = max(delta - 6.0, 0.0); float factor = front * (0.00008 / 0.00065) - behind * smoothstep(0.0, 3.0, behind);'
   );
   composer.addPass(depthOfField);
   // Sky, light shafts and motes are pure light: keep them out of the depth used by DOF and outlines.
   const renderDepthOfField = depthOfField.render.bind(depthOfField);
-  depthOfField.render = (...args) => {
+  if (!mobileEdition) depthOfField.render = (...args) => {
     const hidden = [];
     for (const object of scene.userData.dreamNoDepth || []) {
       if (object.visible) { object.visible = false; hidden.push(object); }
@@ -124,6 +126,7 @@ export function createMainScene(container) {
   const hover = new THREE.Vector2();
   const hoverTarget = new THREE.Vector2();
   window.addEventListener('pointermove', (event) => {
+    if (mobileEdition) return;
     if (event.buttons) {
       hoverTarget.set(0, 0);
       return;
@@ -184,7 +187,7 @@ export function createMainScene(container) {
     adaptResolution: dt => { if (mobilePerformance && mobileBudget.sample(dt)) resize(); },
     prepare: async () => { stylization.prepare(); await renderer.compileAsync(scene, camera); }, needsRender: () => resizePending, render: () => {
     resizePending = false;
-    if (mobilePerformance && performance.now() - lastShadowUpdate >= 50) {
+    if (mobilePerformance && performance.now() - lastShadowUpdate >= (mobileEdition ? 150 : 50)) {
       renderer.shadowMap.needsUpdate = true;
       lastShadowUpdate = performance.now();
     }
