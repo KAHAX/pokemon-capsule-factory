@@ -17,7 +17,7 @@ export class MobileBeautyPass extends Pass {
     });
     this.quad = new FullScreenQuad(this.material);
   }
-  setSize(w,h) { this.target.setSize(w,h); }
+  setSize(w,h) { this.target.setSize(Math.max(1,Math.floor(w)),Math.max(1,Math.floor(h))); }
   render(renderer, writeBuffer, readBuffer) {
     renderer.setRenderTarget(this.target); renderer.clear(); renderer.render(this.scene,this.camera);
     renderer.setRenderTarget(this.renderToScreen ? null : readBuffer); this.quad.render(renderer);
@@ -46,6 +46,9 @@ export function createMobileFocusPass(beauty, camera) {
       }`,
   });
   pass.renderTargetDepth = { texture: beauty.target.depthTexture };
+  // ShaderPass clones uniforms. Depth attachments must remain the exact texture
+  // owned by the framebuffer, including after rotation/resolution changes.
+  pass.uniforms.tDepth.value = beauty.target.depthTexture;
   pass.setSize = (w,h) => pass.uniforms.resolution.value.set(w,h);
   return pass;
 }

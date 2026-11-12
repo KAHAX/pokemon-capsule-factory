@@ -47,8 +47,11 @@ export function createSceneToon(scene, camera, depthOfField, renderer) {
       }
     `,
   });
-  if (mobileEdition) outline.material.fragmentShader = outline.material.fragmentShader.replace(
-    'unpackRGBAToDepth(texture2D(tDepth, uv))', 'texture2D(tDepth, uv).x').replace('edge*.88', 'edge*.38');
+  if (mobileEdition) {
+    outline.uniforms.tDepth.value = depthOfField.renderTargetDepth.texture;
+    outline.material.fragmentShader = outline.material.fragmentShader.replace(
+      'unpackRGBAToDepth(texture2D(tDepth, uv))', 'texture2D(tDepth, uv).x').replace('edge*.88', 'edge*.38');
+  }
   const baseSetSize = outline.setSize.bind(outline);
   outline.setSize = (width, height) => {
     baseSetSize(width, height);
