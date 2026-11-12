@@ -7,8 +7,6 @@ body.mobile-edition { overscroll-behavior: none; -webkit-tap-highlight-color: tr
 .mobile-edition .pack-button { bottom: max(18px, env(safe-area-inset-bottom)); }
 .mobile-edition .mini-collection { bottom: max(26px, calc(env(safe-area-inset-bottom) + 8px)); }
 .mobile-edition button { touch-action: manipulation; }
-.mobile-edition .mobile-spin { left: 50%; bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px)); transform: translateX(-50%); min-width: 126px; min-height: 48px; z-index: 8; }
-.mobile-edition .mobile-spin[hidden] { display: none; }
 .mobile-edition .icon-button { min-width: 44px; min-height: 44px; }
 .mobile-edition .focus-topbar { top: max(20px, env(safe-area-inset-top)); }
 .mobile-edition .focus-bottom { bottom: max(20px, env(safe-area-inset-bottom)); }

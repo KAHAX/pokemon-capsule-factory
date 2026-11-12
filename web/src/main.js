@@ -574,10 +574,6 @@ function bindMachinePointer() {
 }
 
 spinButton?.addEventListener('click', () => {
-  if (mobileEdition && machine?.outputs.length) {
-    startFocusFlight(machine.outputs[machine.outputs.length - 1]);
-    return;
-  }
   const accepted = machine?.spin();
   if (!accepted) toast('机器当前不可扭动，请稍候或先取走出货球');
 });
@@ -658,10 +654,6 @@ function frame(dt) {
   if (focusFlight) focus.renderFlightPreview(focusFlight.ball, focusFlight.outlineStrength, focusFlight.record);
   updateCrankHint();
   if (machine && spinButton) spinButton.disabled = machine.busy || focus?.active || Boolean(focusFlight);
-  if (mobileEdition && spinButton) {
-    spinButton.hidden = !sceneReady || Boolean(focus?.active || focusFlight || pokedexPack?.viewer || $('#pack-dialog').open);
-    spinButton.textContent = machine?.outputs.length ? '打开精灵球' : machine?.busy ? '正在出球…' : '扭一颗';
-  }
 }
 animate();
 
