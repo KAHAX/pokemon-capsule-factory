@@ -23,8 +23,9 @@ export function createStudioEnvironment(renderer, { hero = false } = {}) {
           float h = vDir.y;
           vec3 zenith = vec3(.035, .045, .14), horizon = vec3(.10, .26, .34), ground = vec3(.012, .014, .022);
           vec3 c = mix(horizon, zenith, smoothstep(.02, .75, h));
-          c = mix(c, ground, smoothstep(.0, -.25, h));
-          c += vec3(.30, .16, .42) * exp(-pow((h - .25) / .12, 2.0)) * .35;
+          c = mix(c, ground, 1.0 - smoothstep(-.25, .0, h));
+          float band = (h - .25) / .12;
+          c += vec3(.30, .16, .42) * exp(-band * band) * .35;
           gl_FragColor = vec4(c, 1.0);
         }`,
     }));

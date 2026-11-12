@@ -30,7 +30,8 @@ export class CapsuleAura {
         void main(){
           if(power<.001)discard;
           float edge=1.0-smoothstep(.18,.5,abs(vUv.y-.5));
-          float center=exp(-pow((vUv.y-.5)*5.0,2.0));
+          float centerOffset=(vUv.y-.5)*5.0;
+          float center=exp(-centerOffset*centerOffset);
           float breath=.985+.015*sin(time*1.4);
           vec3 color=mix(tint,coreTint,center);
           float radiance=emissionPass>.5?3.0:2.0;

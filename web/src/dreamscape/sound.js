@@ -1,4 +1,5 @@
 import { WildlifeAudio } from './wildlife-audio.js';
+import { mobileEdition } from '../mobile-performance.js';
 // Quiet, streamed background playlist plus synthesized interaction effects.
 const MUSIC_TRACKS = [
   new URL('assets/audio/pure-white-icelands.mp3', document.baseURI).href,
@@ -19,6 +20,16 @@ export class SoundFX {
     this.ctx = null;
     this.muted = false;
     try { this.muted = localStorage.getItem('capsule-sound-muted') === '1'; } catch { /* storage unavailable */ }
+    this.musicMuted = false;
+    if (!mobileEdition) {
+      // Migrate the old mute preference to music only; effects remain audible.
+      this.musicMuted = this.muted;
+      this.muted = false;
+      try {
+        const saved = localStorage.getItem('capsule-desktop-music-muted');
+        if (saved !== null) this.musicMuted = saved === '1';
+      } catch { /* storage unavailable */ }
+    }
     this.lastPlayed = new Map();
   }
 
@@ -68,6 +79,13 @@ export class SoundFX {
     this.muted = muted;
     try { localStorage.setItem('capsule-sound-muted', muted ? '1' : '0'); } catch { /* ignore */ }
     if (this.ctx) this.master.gain.setTargetAtTime(muted ? 0 : 1, this.ctx.currentTime, .08);
+  }
+
+  setMusicMuted(muted) {
+    this.musicMuted = muted;
+    try { localStorage.setItem('capsule-desktop-music-muted', muted ? '1' : '0'); } catch { /* ignore */ }
+    if (muted) this.music?.pause();
+    else this.playMusic();
   }
 
   ready(key, gap = 0) {
@@ -158,7 +176,7 @@ export class SoundFX {
   }
 
   playMusic() {
-    if (!this.music || document.hidden || !this.music.paused) return;
+    if (!this.music || this.musicMuted || document.hidden || !this.music.paused) return;
     // Autoplay may be denied until a real gesture; unlock() retries on interaction.
     this.music.play().catch(() => {});
   }
@@ -347,16 +365,23 @@ export function installSound({ machine, focus, pokedex, captureBalls = [], boxIn
   wrap(pokedex, 'selectCard', () => fx.select());
   wrap(pokedex, 'receiveCard', () => fx.receive());
 
-  // Mute toggle.
+  // Desktop controls music only; the separate mobile entry keeps its toggle.
   const button = document.createElement('button');
   button.className = 'sound-toggle';
   const paint = () => {
-    button.textContent = fx.muted ? '♪̸' : '♪';
-    button.setAttribute('aria-label', fx.muted ? '打开声音' : '关闭声音');
-    button.setAttribute('aria-pressed', String(!fx.muted));
-    button.title = fx.muted ? '声音：关' : '声音：开';
+    const muted = mobileEdition ? fx.muted : fx.musicMuted;
+    const label = mobileEdition ? '声音' : '背景音乐';
+    button.textContent = muted ? '♪̸' : '♪';
+    button.setAttribute('aria-label', (muted ? '打开' : '关闭') + label);
+    button.setAttribute('aria-pressed', String(!muted));
+    button.title = label + (muted ? '：关' : '：开');
   };
-  button.addEventListener('click', () => { fx.unlock(); fx.setMuted(!fx.muted); paint(); });
+  button.addEventListener('click', () => {
+    if (mobileEdition) fx.setMuted(!fx.muted);
+    else fx.setMusicMuted(!fx.musicMuted);
+    fx.unlock();
+    paint();
+  });
   paint();
   const style = document.createElement('style');
   style.textContent = `.sound-toggle { position: fixed; left: 18px; bottom: 18px; z-index: 60; width: 38px; height: 38px;

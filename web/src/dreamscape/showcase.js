@@ -83,7 +83,8 @@ function createInterior(shiny) {
       void main() {
         if (open < .002) discard;
         // Edge-lit veil: bright at the column's silhouette, clear in the middle where the Pokémon stands.
-        float facing = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.2);
+        // Roundoff can push the dot above 1; fractional powers then produce NaNs.
+        float facing = pow(clamp(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0, 1.0), 2.2);
         float h = clamp(vH / 2.6, 0.0, 1.0);
         float fade = smoothstep(0.0, .08, h) * pow(1.0 - h, 1.6);
         float rays = .65 + .35 * sin(atan(vN.x, vN.z) * 9.0 + time * .6) * sin(h * 7.0 - time * 2.0);

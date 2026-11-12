@@ -64,7 +64,7 @@ export function addRareGlow(ball) {
         shader.fragmentShader = 'uniform float prizeGlowTime,prizeGlowStrength,prizeObservation;\n' + shader.fragmentShader;
         shader.fragmentShader = shader.fragmentShader.replace('#include <emissivemap_fragment>', `
           #include <emissivemap_fragment>
-          float prizeRim = pow(1.0-abs(dot(normalize(normal),normalize(vViewPosition))),2.2);
+          float prizeRim = pow(clamp(1.0-abs(dot(normalize(normal),normalize(vViewPosition))),0.0,1.0),2.2);
           float prizeBreath = .94+.06*sin(prizeGlowTime*2.0);
           vec3 prizeColor=.55+.45*cos(6.2831853*(normal.x*.35+normal.y*.22+prizeGlowTime*.09+vec3(0.,.333,.667)));
           totalEmissiveRadiance += prizeColor*(.06+prizeRim*2.0)*prizeBreath*prizeGlowStrength*mix(1.,.3,prizeObservation);
