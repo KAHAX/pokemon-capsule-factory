@@ -630,10 +630,13 @@ function frame(dt) {
   else if (!focus?.active && !focusFlight && !(mobilePerformance && pokedexPack?.viewer)) updateCamera(dt);
   updateFocusFlight(dt);
   updateBackgroundFade(dt);
-  machine?.update(dt);
-  mobileSupplyBatches?.update();
-  chamberBatches?.update();
-  dreamscape?.update(dt);
+  const restingCard=mobileEdition&&focus?.mode==='card';
+  if(!restingCard){
+    machine?.update(dt);
+    mobileSupplyBatches?.update();
+    chamberBatches?.update();
+    dreamscape?.update(dt);
+  }
   sound?.update(dt);
   // Prepare only the next uncollected prize while it is still at the outlet.
   const nextPrize = machine?.outputs[machine.outputs.length - 1];
@@ -645,8 +648,7 @@ function frame(dt) {
     };
     focus.prepareRecord(nextPrize.userData.focusRecord);
   }
-  boxInteraction?.update(dt);
-  captureBalls.forEach((ball) => ball.update(dt));
+  if(!restingCard){boxInteraction?.update(dt);captureBalls.forEach((ball) => ball.update(dt));}
   const frozenFactory = mobilePerformance && pokedexPack?.viewer && !pokedexPack?.transition;
   if (!focus?.active && !focusFlight && !frozenFactory && !document.hidden) {
     companionFrameTime += dt;

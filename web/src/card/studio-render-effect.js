@@ -90,11 +90,11 @@ export class StudioRenderEffect {
     this.scene.add(this.quad);
   }
 
-  render(scene, camera, { rainbow = false, time = 0 } = {}) {
+  render(scene, camera, { rainbow = false, time = 0, size = null } = {}) {
     const renderer = this.renderer;
     renderer.getDrawingBufferSize(this.size);
-    const width = this.size.x;
-    const height = this.size.y;
+    const width = size?.width || this.size.x;
+    const height = size?.height || this.size.y;
     if (this.beauty.width !== width || this.beauty.height !== height) {
       this.beauty.setSize(width, height);
       this.model.setSize(width, height);

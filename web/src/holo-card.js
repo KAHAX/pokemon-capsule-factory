@@ -1,5 +1,6 @@
 import { playCardRecall } from './card-recall.js';
 import { mobileEdition } from './mobile-performance.js';
+import { MobileCardSurface } from './card/mobile-card-surface.js';
 import { prepareCardSurface } from './card-surface.js';
 import * as THREE from 'three';
 import { PokemonCardScene } from './card/pokemon-card-scene.js';
@@ -108,7 +109,7 @@ class AdoptedCardScene extends PokemonCardScene {
     this.fittedScale = fit.scale;
     this.model.scale.setScalar(fit.scale * this.displaySettings.modelScale);
   }
-  resize() { super.resize(); this.fitModel(); }
+  resize() { if(this.mobileSurface)this.mobileSurface.resize();else super.resize();this.fitModel(); }
 
   updatePortraitView(delta) {
     if (mobileEdition) this.updateModelEffects?.(this.elapsed);
@@ -116,7 +117,7 @@ class AdoptedCardScene extends PokemonCardScene {
     this.displaySettings.parallaxDepth = THREE.MathUtils.damp(this.displaySettings.parallaxDepth, desired.parallaxDepth, 10, delta);
     this.displaySettings.modelScale = THREE.MathUtils.damp(this.displaySettings.modelScale, desired.modelScale, 10, delta);
     this.cardZoom = THREE.MathUtils.damp(this.cardZoom, this.cardZoomTarget, 10, Math.min(delta, .05));
-    this.card.style.setProperty('--card-zoom', this.cardZoom);
+    this.card.style.setProperty('--card-zoom', this.cardZoom*(this.mobileSurface?.fit||1));
     const x = this.current.x, y = this.current.y;
     this.card.style.setProperty('--rotate-x', `${-y * 24}deg`);
     this.card.style.setProperty('--rotate-y', `${x * 36}deg`);
@@ -247,10 +248,22 @@ export class HoloCard {
     this.scene.adoptModel(model, mixer);
     this.setInteractive(false);
     this.setEntrance(0);
-    this.surfaceReady = prepareCardSurface(this).then(surface => { this.cardSurface = surface; }).catch(error => console.warn('卡面缓存准备失败', error));
+    this.surfaceReady = prepareCardSurface(this).then(surface => {
+      if(this.disposed)return;
+      this.cardSurface = surface;
+      if(mobileEdition&&!this.scene.externallyDriven)this.enableMobileSurface();
+    }).catch(error => console.warn('卡面缓存准备失败', error));
+  }
+
+  enableMobileSurface(){
+    if(!mobileEdition||!this.cardSurface||this.scene.mobileSurface||this.disposed)return;
+    this.scene.onMobileSurfaceResize=()=>{if(this.scene.cardInteractive)this.setEntrance(1);};
+    this.scene.mobileSurface=new MobileCardSurface(this.scene,this.cardSurface,this.cardElement);
+    this.scene.renderFrame(0);
   }
 
   setInteractive(enabled) {
+    if(enabled)this.enableMobileSurface();
     this.scene.cardInteractive = enabled;
     this.cardElement.style.pointerEvents = enabled ? 'auto' : 'none';
   }
@@ -302,6 +315,14 @@ export class HoloCard {
 
   captureCanvas({ preview = false, delta = 0 } = {}) {
     const scene = this.scene;
+    if(scene.mobileSurface){
+      scene.renderFrame(delta);
+      const canvas=this.captureSurface||=document.createElement('canvas');
+      const f=this.cardSurface,scale=preview?1:2;
+      if(canvas.width!==f.width*scale||canvas.height!==f.height*scale){canvas.width=f.width*scale;canvas.height=f.height*scale;}
+      canvas.getContext('2d').drawImage(scene.renderer.domElement,0,0,canvas.width,canvas.height);
+      return canvas;
+    }
     if (scene.externallyDriven) scene.renderFrame(delta);
     else scene.studioEffect.render(scene.scene, scene.camera, { rainbow: this.entry.shiny, time: scene.elapsed });
     const canvas = this.captureSurface ||= document.createElement('canvas');
@@ -361,6 +382,7 @@ export class HoloCard {
   }
 
   dispose() {
+    this.disposed=true;
     this.recallEffect?.stopIfIncomplete();
     this.scene.dispose();
     this.scene.renderer.forceContextLoss();

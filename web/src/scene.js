@@ -35,7 +35,7 @@ export function createMainScene(container) {
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000); // include the distant Rayquaza patrol
   camera.position.set(15.96, 13.22, 25.48);
   const baseTarget = new THREE.Vector3(0, 6.5, 0);
-  if (mobileEdition) camera.position.sub(baseTarget).multiplyScalar(.9).add(baseTarget);
+  if (mobileEdition) camera.position.sub(baseTarget).setLength(20).add(baseTarget);
   camera.lookAt(baseTarget);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.copy(baseTarget);

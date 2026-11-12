@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mobileEdition } from '../mobile-performance.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -275,9 +276,14 @@ export class PokemonCardScene extends ParallaxCard {
 
   tick() {
     if (this.externallyDriven) return;
-    const delta = Math.min(this.clock.getDelta(), 0.05);
-    this.renderFrame(delta);
     this.frame = requestAnimationFrame(this.tick);
+    let delta = Math.min(this.clock.getDelta(), mobileEdition ? 0.1 : 0.05);
+    if (mobileEdition) {
+      this.pendingDelta=(this.pendingDelta||0)+delta;
+      if (this.pendingDelta<1/30-.001) return;
+      delta=this.pendingDelta;this.pendingDelta=0;
+    }
+    this.renderFrame(delta);
   }
 
   renderFrame(delta = 0) {
@@ -308,12 +314,13 @@ export class PokemonCardScene extends ParallaxCard {
       this.particles.rotation.z = this.elapsed * 0.012;
       this.mixer?.update(delta);
     }
-    this.studioEffect.render(this.scene, this.camera, { rainbow: this.character?.shiny, time: this.elapsed });
+    (this.mobileSurface || this.studioEffect).render(this.scene, this.camera, { rainbow: this.character?.shiny, time: this.elapsed });
   }
 
   dispose() {
     this.loadToken += 1;
     this.clearModel();
+    this.mobileSurface?.dispose();
     this.studioEffect?.dispose();
     this.environmentTarget?.dispose();
     super.dispose();

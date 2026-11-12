@@ -1,4 +1,4 @@
-import { mobilePerformance } from './mobile-performance.js';
+import { mobileEdition, mobilePerformance } from './mobile-performance.js';
 import { scenePixelRatio } from './render-budget.js';
 import { pickInteractionClips, pickCardClips } from './pokemon-animation-policy.js';
 import { prepareVineDisplay } from './vine-display.js';
@@ -909,7 +909,9 @@ export class FocusExperience {
       this.seamAura.update(dt, glow, this.effectTime, gather);
     }
     if (!this.card) this.pokemonMixer?.update(dt);
-    this.pokemon?.userData.updateEffects?.(this.effectTime);
+    // A mobile card owns its effect clock after adopting the model. Mixing the
+    // observation clock into the same uniforms makes its aurora jump each frame.
+    if (!mobileEdition || !this.card) this.pokemon?.userData.updateEffects?.(this.effectTime);
     if (this.minimizeState) {
       const state = this.minimizeState;
       state.elapsed += Math.min(dt, 1 / 30);

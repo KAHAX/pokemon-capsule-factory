@@ -19,4 +19,8 @@ assert.equal(renders,15);assert.equal(updates,15);assert(Math.abs(seconds-1)<1e-
 card.onVisibilityChange();card.tick();assert.equal(queued.size,0);assert.equal(renders,15,'hidden preview must not create a second render loop');
 card.setExternalDriving(false);assert.equal(queued.size,1,'expanded card resumes one render loop');
 card.setExternalDriving(false);assert.equal(queued.size,1,'resuming twice must not duplicate RAF');
+card.clock.getDelta=()=>1/120;renders=0;seconds=0;
+for(let i=0;i<120;i++){const [id,fn]=queued.entries().next().value;queued.delete(id);fn();}
+assert.equal(renders,30,'120 Hz devices must not render the phone card 120 times per second');
+assert(Math.abs(seconds-1)<1e-6,'frame limiting preserves animation time');
 console.log('PASS: preview has one driver, continuous animation timing and one render loop after handoff');
