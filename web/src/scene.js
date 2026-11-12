@@ -187,7 +187,7 @@ export function createMainScene(container) {
     adaptResolution: dt => { if (mobilePerformance && mobileBudget.sample(dt)) resize(); },
     prepare: async () => { stylization.prepare(); await renderer.compileAsync(scene, camera); }, needsRender: () => resizePending, render: () => {
     resizePending = false;
-    if (mobilePerformance && performance.now() - lastShadowUpdate >= (mobileEdition ? 150 : 50)) {
+    if (mobilePerformance && (mobileEdition ? lastShadowUpdate === -Infinity : performance.now() - lastShadowUpdate >= 50)) {
       renderer.shadowMap.needsUpdate = true;
       lastShadowUpdate = performance.now();
     }

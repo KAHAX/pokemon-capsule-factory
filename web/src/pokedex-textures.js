@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { mobileEdition } from './mobile-performance.js';
+import mobileTextures from './mobile-textures.json';
 import { createPokedexDetailArt } from './pokedex-detail-art.js';
 
 // AI-authored material atlas, sampled in each part's own coordinates so the
@@ -142,7 +144,7 @@ normal=normalize(abs(dexDet)*normal-sign(dexDet)*dexGradient);`);
 }
 
 export async function applyPokedexTextures(pack) {
-  const atlas=await new THREE.TextureLoader().loadAsync('/assets/pokedex/pokedex-material-atlas-v1.png');
+  const atlas=await new THREE.TextureLoader().loadAsync(mobileEdition ? mobileTextures.pokedex : '/assets/pokedex/pokedex-material-atlas-v1.png');
   atlas.colorSpace=THREE.SRGBColorSpace;
   atlas.anisotropy=Math.min(8,pack.renderer.capabilities.getMaxAnisotropy());
   const legends=makeLegends();legends.anisotropy=atlas.anisotropy;

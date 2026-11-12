@@ -1,5 +1,8 @@
 import {decodeAssetChunk} from './asset-decode.js';
-import manifest from './transfer-manifest.json';
+import originalManifest from './transfer-manifest.json';
+import mobileManifest from './mobile-transfer-manifest.json';
+import { mobileEdition } from './mobile-performance.js';
+const manifest=mobileEdition ? {...originalManifest,...mobileManifest} : originalManifest;
 
 const states=new Map();
 const names={'machine.glb':'扭蛋机','pokeball.glb':'精灵球','scene-v5-additions.glb':'背景装置','chamber-one-shot.glb':'舱内动画','pokedex.glb':'图鉴'};
@@ -15,7 +18,9 @@ const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 export async function downloadPacked(url,onProgress) {
  const key=new URL(url,location.href).pathname,entry=manifest[key];
  if(!entry)return null;
- const output=new Uint8Array(entry.size);let completed=0,next=0;
+ const output=new Uint8Array(entry.size);let completed=0,transferred=0,next=0;
+ const transferBytes=entry.parts.reduce((n,part)=>n+part.bytes,0);
+ const partialBytes=new Array(entry.parts.length).fill(0);let lastProgress=0;
  const offsets=[];let total=0;
  for(const part of entry.parts){offsets.push(total);total+=part.size;}
  if(total!==entry.size)throw Error('模型分块清单不完整');
@@ -24,11 +29,27 @@ export async function downloadPacked(url,onProgress) {
  async function downloadPart(i) {
   const part=entry.parts[i];let result;
   for(let attempt=0;attempt<3;attempt++) {
-   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),30000);
+   const controller=new AbortController();let timeout;
+   const resetTimeout=()=>{clearTimeout(timeout);timeout=setTimeout(()=>controller.abort(),30000);};
+   resetTimeout();partialBytes[i]=0;
    try {
     const response=await fetch(part.url,{signal:controller.signal,cache:'force-cache'});
     if(!response.ok)throw Error(`HTTP ${response.status}`);
-    const bytes=new Uint8Array(await response.arrayBuffer());
+    let bytes;
+    if(mobileEdition && response.body?.getReader) {
+     // A slow but progressing download must not restart every 30 seconds.
+     // On phones, time out only after 30 seconds with no new network data.
+     const reader=response.body.getReader(),chunks=[];let length=0;
+     try { while(true) {
+      const {done,value}=await reader.read();if(done)break;
+      resetTimeout();chunks.push(value);length+=value.byteLength;partialBytes[i]=length;
+      if(length>part.bytes)throw Error('下载数据长度异常');
+      if(Date.now()-lastProgress>200){lastProgress=Date.now();onProgress?.(`下载 ${((transferred+partialBytes.reduce((n,b)=>n+b,0))/1048576).toFixed(1)}/${(transferBytes/1048576).toFixed(1)} MB`);}
+     }} finally { reader.releaseLock(); }
+     bytes=new Uint8Array(length);let cursor=0;
+     for(const chunk of chunks){bytes.set(chunk,cursor);cursor+=chunk.byteLength;}
+    } else bytes=new Uint8Array(await response.arrayBuffer());
+    clearTimeout(timeout);
     if(bytes.length!==part.bytes)throw Error('下载数据不完整');
     result=await decodeAssetChunk(bytes);
     if(result.length!==part.size)throw Error('解压校验失败');
@@ -39,8 +60,8 @@ export async function downloadPacked(url,onProgress) {
     await delay(500*(attempt+1));
    } finally {clearTimeout(timeout);}
   }
-  output.set(result,offsets[i]);completed+=result.length;
-  onProgress?.(`下载 ${(completed/1048576).toFixed(1)}/${(entry.size/1048576).toFixed(1)} MB`);
+  output.set(result,offsets[i]);completed+=result.length;transferred+=part.bytes;partialBytes[i]=0;
+  onProgress?.(`下载 ${((mobileEdition?transferred:completed)/1048576).toFixed(1)}/${((mobileEdition?transferBytes:entry.size)/1048576).toFixed(1)} MB`);
   await delay(0);
  }
  await Promise.all(Array.from({length:Math.min(2,entry.parts.length)},async()=>{

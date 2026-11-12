@@ -193,7 +193,9 @@ export function createWetGround({ renderer, camera, time, center, groundY, size 
     const moved = lastView.elements.some((value, i) => Math.abs(value - cam.matrixWorld.elements[i]) > .0001);
     frame++;
     if (mobileEdition) {
-      if (!resized && performance.now() - lastReflectionTime < (moved ? 100 : 200)) return;
+      // Cache the floor reflection. Refresh only after a viewpoint change, not
+      // for every background animation; leave the wet surface and neon ring intact.
+      if (!resized && (!moved || performance.now() - lastReflectionTime < 350)) return;
       lastReflectionTime = performance.now();
     } else if (!moved && !resized && frame % 2) return;
     lastView.copy(cam.matrixWorld);

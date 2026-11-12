@@ -22,6 +22,8 @@ import { refineSceneMaterials } from './scene-materials.js';
 import { BoxInteraction } from './box-interaction.js';
 import { CaptureBall } from './capture-ball.js';
 import { BackgroundCompanions } from './background-companions.js';
+import { MobileCompanions } from './mobile-companions.js';
+import { createMobileSupplyBatches } from './mobile-supply-batches.js';
 import { PokedexPack } from './pokedex-pack.js';
 import { LoadingBall } from './loading-ball.js';
 import { installDreamscape } from './dreamscape/index.js';
@@ -74,6 +76,7 @@ let cameraReturn;
 const loader = createAssetLoader();
 let sceneReady = false;
 let chamberBatches;
+let mobileSupplyBatches;
 let machine;
 let focus;
 let boxInteraction;
@@ -264,7 +267,7 @@ async function initialize() {
     useMobileGlass(scene);
   }
   homeView.background.copy(scene.background);
-  backgroundCompanions = new BackgroundCompanions(scene, { machine, camera });
+  backgroundCompanions = mobileEdition ? new MobileCompanions(scene) : new BackgroundCompanions(scene, { machine, camera });
   machine.onSpinInteraction = () => backgroundCompanions?.mew?.startle();
   const debugButton = $('#supply-debug');
   const setSupplyDebug = (visible) => {
@@ -307,10 +310,15 @@ async function initialize() {
   // Compile before revealing the factory instead of stalling the first visible frame
   // each time another animated character/material arrives.
   chamberBatches = batchChamberBalls(machine.chamber);
+  if (mobileEdition) { mobileSupplyBatches=createMobileSupplyBatches(scene,machine.supply);mobileSupplyBatches.update(); }
   chamberBatches.update();
   machine.chamber.renderBatches = chamberBatches.batches;
   batchRigidSiblings(boxInteraction.root, boxAsset.animations);
-  setProgress(80, '正在准备场景宝可梦… 0 / 12');
+  if (mobileEdition) {
+    // Merge only static siblings; crank action roots and animated pivots stay separate.
+    for (const asset of [machineAsset, additions, handbag, cart, props].filter(Boolean)) batchRigidSiblings(asset.scene, asset.animations);
+  }
+  setProgress(80, `正在准备场景宝可梦… 0 / ${mobileEdition ? 3 : 12}`);
   await backgroundCompanions.load({
     onProgress: (completed, total) => setProgress(80 + Math.round(completed / total * 12),
       `正在准备场景宝可梦… ${completed} / ${total}`),
@@ -623,6 +631,7 @@ function frame(dt) {
   updateFocusFlight(dt);
   updateBackgroundFade(dt);
   machine?.update(dt);
+  mobileSupplyBatches?.update();
   chamberBatches?.update();
   dreamscape?.update(dt);
   sound?.update(dt);

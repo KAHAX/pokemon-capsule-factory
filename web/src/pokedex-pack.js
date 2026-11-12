@@ -1,4 +1,4 @@
-import { mobilePerformance } from './mobile-performance.js';
+import { mobileEdition, mobilePerformance } from './mobile-performance.js';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { findByKey } from './assets.js';
@@ -493,6 +493,10 @@ export class PokedexPack {
 
   update(dt) {
     const dockIdle = !this.viewer && !this.receiving && !this.transition && !this.opening;
+    // The dock is a separate full-screen WebGL canvas. On phones its resting
+    // image needs no recurring render; opening, collecting and resize invalidate it.
+    if (mobileEdition && dockIdle && this.mobileDockCached && !this.forceDockRender) return;
+    if (!dockIdle) this.mobileDockCached=false;
     const hoverTarget = dockIdle && (this.dockHovered || this.button.matches(':focus-visible')) ? 1 : 0;
     this.dockHover = THREE.MathUtils.damp(this.dockHover, hoverTarget, 16, Math.min(dt, .05));
     if (Math.abs(this.dockHover - hoverTarget) < .001) this.dockHover = hoverTarget;
@@ -566,8 +570,9 @@ export class PokedexPack {
     }
     this.updatePose();
     this.dockRenderTime = (this.dockRenderTime || 0) + dt;
-    if (!mobilePerformance || !dockIdle || this.dockHover !== hoverTarget || this.dockRenderTime >= 1 / 12 || this.forceDockRender) {
+    if (!mobilePerformance || !dockIdle || (mobileEdition && !this.mobileDockCached) || this.dockHover !== hoverTarget || this.dockRenderTime >= 1 / 12 || this.forceDockRender) {
       this.renderer.render(this.scene, this.camera);
+      if (mobileEdition) this.mobileDockCached=dockIdle;
       this.dockRenderTime=0; this.forceDockRender=false;
     }
   }

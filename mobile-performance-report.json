@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-12",
+  "scope": "/mobile/ only; original edition preserved",
+  "startupModels": {
+    "beforeRequests": 103,
+    "afterBytes": 11540687,
+    "afterRequests": 20,
+    "beforeMiB": 26.725
+  },
+  "coldTest": {
+    "readyMs": 49347,
+    "observedTransferBytes": 13202601,
+    "cpuSlowdown": 4,
+    "cacheDisabled": true,
+    "latencyMs": 100,
+    "networkBytesPerSecond": 300000,
+    "errors": 0
+  },
+  "interactionTest": {
+    "touchCrank": true,
+    "idlePokedexRendersIn60Frames": 0,
+    "pokedex": true,
+    "openPokemon": true,
+    "landscape": true,
+    "collectCard": true,
+    "touchOutput": true
+  },
+  "limits": [
+    "Desktop Chromium emulation is not a Huawei GPU or WeChat WebView measurement.",
+    "Background cast is reduced to three species. Shadows are static and ground reflections refresh on camera movement.",
+    "Phone textures use lower resolution; original meshes retain triangle counts and positions."
+  ]
+}

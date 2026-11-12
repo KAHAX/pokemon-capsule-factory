@@ -1,0 +1,132 @@
+[
+  {
+    "file": "machine.glb",
+    "bytes": 6025044,
+    "transfer": 1806323,
+    "requests": 3,
+    "imageBefore": 340835,
+    "imageAfter": 37630,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "pokeball.glb",
+    "bytes": 367080,
+    "transfer": 154024,
+    "requests": 1,
+    "imageBefore": 0,
+    "imageAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "handbag-v5.glb",
+    "bytes": 684096,
+    "transfer": 415064,
+    "requests": 1,
+    "imageBefore": 1466222,
+    "imageAfter": 248450,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "box-v5.glb",
+    "bytes": 1574064,
+    "transfer": 429557,
+    "requests": 1,
+    "imageBefore": 0,
+    "imageAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "display_props.glb",
+    "bytes": 627920,
+    "transfer": 387835,
+    "requests": 1,
+    "imageBefore": 26832,
+    "imageAfter": 8090,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "output-sequence.glb",
+    "bytes": 661892,
+    "transfer": 246810,
+    "requests": 1,
+    "imageBefore": 0,
+    "imageAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "chamber-one-shot.glb",
+    "bytes": 929888,
+    "transfer": 629069,
+    "requests": 1,
+    "imageBefore": 0,
+    "imageAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "cart-v5.glb",
+    "bytes": 463856,
+    "transfer": 382890,
+    "requests": 1,
+    "imageBefore": 1353213,
+    "imageAfter": 110344,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "pokedex.glb",
+    "bytes": 2697352,
+    "transfer": 936035,
+    "requests": 2,
+    "imageBefore": 3438,
+    "imageAfter": 8478,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "pokemon-neon-sign.glb",
+    "bytes": 616460,
+    "transfer": 473591,
+    "requests": 1,
+    "imageBefore": 121737,
+    "imageAfter": 3574,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "companions/587.glb",
+    "bytes": 456760,
+    "transfer": 215248,
+    "requests": 1,
+    "imageBefore": 39392,
+    "imageAfter": 27310,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "pokemon-v5/025.glb",
+    "bytes": 2806708,
+    "transfer": 1329711,
+    "requests": 2,
+    "imageBefore": 797778,
+    "imageAfter": 209974,
+    "geometryUnchanged": true
+  },
+  {
+    "file": "scene-v5-additions.glb",
+    "bytes": 5232872,
+    "transfer": 4021695,
+    "requests": 3,
+    "imageBefore": 2762053,
+    "imageAfter": 322916,
+    "geometryUnchanged": false,
+    "topologyUnchanged": true,
+    "precisionOnly": true
+  },
+  {
+    "file": "companions/081.glb",
+    "bytes": 258236,
+    "transfer": 112835,
+    "requests": 1,
+    "imageBefore": 173662,
+    "imageAfter": 38104,
+    "geometryUnchanged": true,
+    "topologyUnchanged": true,
+    "precisionOnly": false
+  }
+]

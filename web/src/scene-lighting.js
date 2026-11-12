@@ -36,7 +36,7 @@ export function applyBlenderLighting(scene, renderer, settings) {
   renderer.toneMappingExposure = settings.exposure * 1.0;
 
   RectAreaLightUniformsLib.init();
-  settings.lights.forEach((config) => {
+  (mobileEdition ? [] : settings.lights).forEach((config) => {
     const color = new THREE.Color().setRGB(...config.color, THREE.LinearSRGBColorSpace);
     const position = new THREE.Vector3().fromArray(config.position);
     const direction = new THREE.Vector3().fromArray(config.direction);
@@ -57,9 +57,17 @@ export function applyBlenderLighting(scene, renderer, settings) {
     light.lookAt(position.clone().add(direction));
     scene.add(light);
   });
+  if (mobileEdition) {
+    const soft = new THREE.HemisphereLight('#fff0d8', '#27354c', .9);
+    const keyLight = new THREE.DirectionalLight('#ffdbac', 1.5);
+    keyLight.position.set(-8,12,10);
+    const rim = new THREE.DirectionalLight('#9bbdff', .8);
+    rim.position.set(5,9,-8);
+    scene.add(soft,keyLight,rim);
+  }
 
   const key = settings.lights.find((light) => light.name === 'Warm key softbox');
-  if (key) {
+  if (key && !mobileEdition) {
     const shadow = new THREE.DirectionalLight('#fff0d8', .35);
     shadow.name = 'Soft ambient key shadows';
     shadow.position.fromArray(key.position);
@@ -79,7 +87,7 @@ export function applyBlenderLighting(scene, renderer, settings) {
   heroFill.name = 'Hero portrait softbox';
   heroFill.position.set(5, 7, 10);
   heroFill.lookAt(0, 4, 0);
-  scene.add(heroFill);
+  if (!mobileEdition) scene.add(heroFill);
 
   // Dedicated feathered key: keeps illumination concentrated on the gacha machine.
   const heroSpot = new THREE.SpotLight('#ffdfad', 1800, 48, .58, .45, 2);

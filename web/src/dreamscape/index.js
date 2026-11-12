@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { mobileEdition } from '../mobile-performance.js';
+import mobileTextures from '../mobile-textures.json';
 import { createGalaxyFrame, createGalaxySky, createStarField } from './sky.js';
 import { createWetGround } from './wet-ground.js';
 import { createLightShaft, createFireflies, addMoonlight, createDust, createHorizonMist } from './atmosphere.js';
@@ -86,7 +88,7 @@ export function installDreamscape({ scene, renderer, camera, controls, bloom, ti
   bloom.bloomTintColors.forEach((tint, i) => tint.set(...tints[i]));
 
   const sky = { mesh: null };
-  new THREE.TextureLoader().loadAsync('/assets/milky-way-4k.jpg').then(texture => {
+  new THREE.TextureLoader().loadAsync(mobileEdition ? mobileTextures.sky : '/assets/milky-way-4k.jpg').then(texture => {
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.wrapS = THREE.RepeatWrapping;
     texture.generateMipmaps = false;
