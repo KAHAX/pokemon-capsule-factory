@@ -38,7 +38,7 @@ Unused Pokémon animation clips have been removed while preserving the clips use
 - Mobile startup models use a separate content-addressed manifest: 17.3 MiB across 33 requests, versus the earlier 26.7 MiB across 103 requests. Model textures are capped at 512 pixels; the sky and Pokédex surface atlas have separate smaller textures. Original model files and the desktop manifest remain unchanged. Prize models still load on demand from the existing collection.
 - `cd web && node scripts/build-mobile-assets.mjs` regenerates the mobile assets. It preserves triangle counts, vertex positions, UV layout, node names and clip selections. Background prop normal/UV precision is packed without quantizing positions: scene setup needs to reposition connected sign vertices. Phone downloads use a 30-second inactivity deadline so progressing slow transfers are not repeatedly restarted.
 
-- Mobile Pokédex previews use a single externally driven 15 Hz portrait renderer and a 1x card texture. A tighter depth range and offset card faces prevent overlapping surfaces from competing for depth. Selecting a card resumes its own animation loop; desktop rendering remains unchanged.
+- Pokédex previews update only the active portrait (15 Hz on mobile / 20 Hz on desktop), retain at most two mobile or three desktop previews, and reuse saved thumbnails. Card switches pause portrait capture and use a short snapshot slide/fade. Separated card bodies prevent overlapping faces from competing for depth. Selecting a card hands off its existing preview and resumes its animation loop. The yellow double-chevron hint appears beside the card only after the full opening animation.
 - Expanded mobile cards combine their cached text/frame, live 3D portrait and moving glare into one GPU surface before tilting. Their animation loop is capped at 30 FPS, the card owns the adopted model's effect clock, and the hidden factory simulation pauses while inspecting a card. Landscape resize keeps the card centered and fitted. Desktop cards retain their original renderer/composition. Automated touch/rotation checks use desktop Chrome emulation; they do not establish frame rates on a physical Huawei phone.
 
 - Wait for the ordinary scene Pokémon and initial rendering before revealing the factory.
@@ -46,5 +46,7 @@ Unused Pokémon animation clips have been removed while preserving the clips use
 - Random shiny scene visitors and the shiny Mew replacement are removed. Ordinary Mew behavior and shiny capsule prizes remain in both editions.
 
 The original development project is separate from this publication copy. Future edits must be copied or committed here deliberately before redeploying.
+
+The November 13 interaction update includes the five-minute mystery-box recharge and lake-guardian reward, synchronized button pulses, sign fault light/sound interaction, earlier capsule output after chamber rotation stops, richer Mew movement, and brighter close-body shiny stars with restrained Fresnel color flow. Lake-guardian framing excludes tails; card collection begins its particle transition immediately after ball closure.
 
 Pokémon names and artwork belong to their respective owners. Additional asset attribution is in `web/public/credits`.

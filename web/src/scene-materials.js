@@ -109,8 +109,15 @@ export function refineSceneMaterials(scene, renderer) {
       object.material = Array.isArray(object.material) ? object.material.map(redFace) : redFace(object.material);
     }
     if (!object.isMesh || !object.name.toLowerCase().replace(/[^a-z]/g, '').includes('frontivoryquestion')) return;
+    const cloneQuestionMaterial = source => {
+      const material = source.clone();
+      // Preserve the charge shader and its live uniform when refining enamel.
+      material.onBeforeCompile = source.onBeforeCompile;
+      material.customProgramCacheKey = source.customProgramCacheKey;
+      return material;
+    };
     object.material = Array.isArray(object.material)
-      ? object.material.map(material => material.clone()) : object.material.clone();
+      ? object.material.map(cloneQuestionMaterial) : cloneQuestionMaterial(object.material);
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     for (const material of materials) {
       if (!/Fire \| 04 奶白问号 · Ivory enamel/.test(material.name)) continue;

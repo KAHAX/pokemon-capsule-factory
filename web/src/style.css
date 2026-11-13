@@ -19,3 +19,17 @@ body.focus-active .brand,body.focus-active .supply-panel,body.focus-active .supp
 .loading-ball-stage canvas{position:relative;z-index:1}
 
 
+
+/* A small gold/ivory icon hint anchored to the card itself. */
+.pokedex-scroll-nav{position:fixed;transform:translate(-50%,-50%);z-index:65;display:grid;justify-items:center;grid-template-columns:36px;gap:8px;color:#ffdf57;animation:card-nav-breathe 2.7s ease-in-out infinite;filter:drop-shadow(0 0 3px #ffd54acc) drop-shadow(0 0 8px #ffcc4970)}
+.pokedex-scroll-nav[hidden]{display:none}
+.pokedex-scroll-nav button{display:grid;place-items:center;border:0;background:transparent;padding:0;color:inherit;width:36px;height:30px;line-height:0;cursor:pointer}
+.pokedex-scroll-nav svg{display:block;width:30px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.pokedex-scroll-nav .scroll-mouse{width:30px;height:40px;justify-self:center}
+.pokedex-scroll-nav .scroll-wheel{animation:card-nav-wheel 2.7s ease-in-out infinite}
+.pokedex-scroll-nav button:hover{color:#fff8e8;filter:drop-shadow(0 0 4px #ffd88c)}
+@keyframes card-nav-breathe{0%,100%{opacity:.62;color:#f3c337}50%{opacity:1;color:#ffeb79}}
+@keyframes card-nav-wheel{0%,100%{transform:translateY(-1px);opacity:.4}50%{transform:translateY(2px);opacity:1}}
+@media(prefers-reduced-motion:reduce){.pokedex-scroll-nav,.pokedex-scroll-nav .scroll-wheel{animation:none;opacity:.8}}
+.pokedex-scroll-nav button{height:44px}
+.pokedex-scroll-nav svg.double-chevron{width:32px;height:36px;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}

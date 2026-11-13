@@ -33,6 +33,9 @@ export class ChamberOneShot {
     this.playing = false;
     this.outputFired = false;
     this.elapsed = 0;
+    // The baked chamber balls finish their tumble at 5 s. The incoming ball's
+    // later 7.15 s handoff is an independent replenishment cue.
+    this.settleTime = 5;
     this.incomingPrepared = false;
     this.incomingStarted = false;
     this.incomingComplete = false;
@@ -109,9 +112,10 @@ export class ChamberOneShot {
     if (!this.playing) return;
     this.elapsed += dt;
     this.mixer.update(dt);
-    this.exitBall.visible = this.exitBall.position.y >= 4.15;
-    if (!this.outputFired && this.elapsed >= 7.15) {
+    this.exitBall.visible = !this.outputFired && this.exitBall.position.y >= 4.15;
+    if (!this.outputFired && this.elapsed >= this.settleTime) {
       this.outputFired = true;
+      this.exitBall.visible = false;
       this.onOutput();
     }
     if (this.incomingPrepared && !this.incomingStarted && this.elapsed >= this.incomingHandoffTime) this.startIncoming();

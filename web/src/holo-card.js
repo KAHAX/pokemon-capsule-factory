@@ -112,7 +112,7 @@ class AdoptedCardScene extends PokemonCardScene {
   resize() { if(this.mobileSurface)this.mobileSurface.resize();else super.resize();this.fitModel(); }
 
   updatePortraitView(delta) {
-    if (mobileEdition) this.updateModelEffects?.(this.elapsed);
+    this.updateModelEffects?.(this.elapsed);
     const desired = getDisplaySettings();
     this.displaySettings.parallaxDepth = THREE.MathUtils.damp(this.displaySettings.parallaxDepth, desired.parallaxDepth, 10, delta);
     this.displaySettings.modelScale = THREE.MathUtils.damp(this.displaySettings.modelScale, desired.modelScale, 10, delta);
@@ -326,7 +326,7 @@ export class HoloCard {
     if (scene.externallyDriven) scene.renderFrame(delta);
     else scene.studioEffect.render(scene.scene, scene.camera, { rainbow: this.entry.shiny, time: scene.elapsed });
     const canvas = this.captureSurface ||= document.createElement('canvas');
-    const scale = preview && mobileEdition ? 1 : 2;
+    const scale = preview ? 1 : 2;
     const targetWidth = this.cardSurface ? Math.round(this.cardSurface.width * scale) : 600;
     const targetHeight = this.cardSurface ? Math.round(this.cardSurface.height * scale) : 850;
     if (canvas.width !== targetWidth || canvas.height !== targetHeight) { canvas.width = targetWidth; canvas.height = targetHeight; }

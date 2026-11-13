@@ -277,17 +277,13 @@ export class CapsuleMachine {
 
   releaseOutputNow() {
     if (this.hasEjected) return;
-    if (!this.supplyHandedOff && this.spinCount > 1) {
-      this.awaitingSupply = true;
-      this.onStatus('等待队首进入遮挡交接区');
-      return;
-    }
+    if (!this.chamber.outputFired) return;
     this.awaitingSupply = false;
     this.hasEjected = true;
     this.dispensing = true;
     const shiny = this.finalIcon === 1;
     const ball = this.outputAnimator.play(this.outputs.length, (output) => this.finishOutput(output), shiny ? {
-      lead: .45,
+      lead: 0,
       onApproach: () => this.beginShinyOutlet(),
       onExit: () => this.onShinyOutletClear?.(),
     } : undefined);
@@ -302,7 +298,6 @@ export class CapsuleMachine {
 
   completeChamber() {
     this.spinning = false;
-    this.hasEjected = false;
     this.awaitingSupply = false;
   }
 
@@ -334,10 +329,10 @@ export class CapsuleMachine {
   }
 
   updateSpin(dt) {
-    if (!this.spinning) return;
+    if (!this.spinning && !this.chamber.playing) return;
     this.spinTime += dt;
     const t = this.spinTime;
-    if (t >= 7.2 && !this.topReleaseRequested) {
+    if (t >= (this.finalIcon === 1 ? 6.15 : 3.15) && !this.topReleaseRequested) {
       this.topReleaseRequested = true;
       this.supply.requestRelease();
     }
@@ -353,8 +348,9 @@ export class CapsuleMachine {
       this.setDisplays(this.screens.map(() => this.finalIcon), true);
     }
     const gold = this.iconsAligned && this.finalIcon === 1;
-    const { level: flash, flashing } = prizeFlash(t, gold);
-    if (gold && !flashing) this.beginShinyOutlet();
+    const { level: flash } = prizeFlash(t, gold);
+    // The chamber's stop cue releases the prize; screen flashes and the top
+    // replenishment ball do not gate the outlet.
     this.reservoirBands.update(flash * .85, gold);
     this.screens.forEach((screen) => { screen.material.emissiveIntensity = flash; });
     if (this.indicator?.material) this.indicator.material.emissiveIntensity = flash;

@@ -67,7 +67,7 @@ export class PokemonCardScene extends ParallaxCard {
     if (this.scene.background?.isTexture) this.scene.background.dispose();
     this.scene.background = this.createElectricStarTexture();
     this.scene.backgroundIntensity = character.shiny ? 1.4 : 1.15;
-    this.renderer.toneMappingExposure = character.shiny ? 0.9 : 2 ** -0.75;
+    this.renderer.toneMappingExposure = character.shiny ? 0.64 : 2 ** -0.75;
     this.scene.fog = new THREE.Fog(this.theme.dark, 17, 38);
     this.particles.children.forEach((child) => disposeObject(child));
     this.particles.clear();

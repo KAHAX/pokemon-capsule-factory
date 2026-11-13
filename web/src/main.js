@@ -2,6 +2,8 @@ import { useMobileGlass } from './mobile-rendering.js';
 import { mobileEdition, mobilePerformance } from './mobile-performance.js';
 import { extendConveyor } from './extended-conveyor.js';
 import { replaceMainSign } from './neon-sign.js';
+import { installSignInteraction } from './sign-interaction.js';
+let signInteraction;
 import { batchChamberBalls } from './chamber-batching.js';
 import { batchRigidSiblings } from './static-batching.js';
 import { installNextPokemonPanel } from './next-pokemon-panel.js';
@@ -255,6 +257,7 @@ async function initialize() {
   });
   extendConveyor(scene, machine);
   replaceMainSign(scene, neonSign, renderer);
+  signInteraction=installSignInteraction(scene);
   if (mobileEdition) batchRigidSiblings(neonSign.scene, neonSign.animations);
   boxInteraction = new BoxInteraction(scene, boxAsset);
   await yieldLoadingFrame();
@@ -352,6 +355,8 @@ async function initialize() {
     get pokedex() { return pokedexPack; },
     get companions() { return backgroundCompanions; },
     get sound() { return sound; },
+    get box() { return boxInteraction; },
+    get sign() { return signInteraction; },
     get outputs() { return machine.outputs.length; },
     get mode() { return focus.mode; },
     get cards() { return store.cards.length; },
@@ -372,8 +377,8 @@ async function initialize() {
 
 let focusFlight;
 
-function startFocusFlight(source) {
-  if (machine.outputs[machine.outputs.length - 1] !== source) return;
+function startFocusFlight(source, fromBox = false) {
+  if (!fromBox && machine.outputs[machine.outputs.length - 1] !== source) return;
   const record = source.userData.focusRecord ||= {
     uid: globalThis.crypto?.randomUUID?.() || `ball-${Date.now()}`,
     resultIcon: source.userData.resultIcon,
@@ -383,8 +388,9 @@ function startFocusFlight(source) {
   // Keep the already-visible rare aura alive across the renderer handoff.
   const existingGlow = machine.rareGlows.get(source);
   if (existingGlow) machine.rareGlows.delete(source);
-  const ball = machine.detachOutput(source);
+  const ball = fromBox ? source : machine.detachOutput(source);
   if (!ball) return;
+  if(fromBox)ball.userData.boxFlightMix=0;
   backgroundFade = null;
   focus.prepareLighting();
   if (existingGlow) {
@@ -460,6 +466,7 @@ function updateFocusFlight(dt) {
   flight.elapsed += dt;
   const t = Math.min(flight.elapsed / flight.duration, 1);
   const eased = THREE.MathUtils.smoothstep(t, 0, 1);
+  if(flight.ball.userData.boxFlightMix!==undefined)flight.ball.userData.boxFlightMix=THREE.MathUtils.smootherstep(t,.08,.9);
   if (flight.mode === 'return') {
     const inverse = 1 - eased;
     flight.ball.position.copy(flight.startPosition).multiplyScalar(inverse * inverse)
@@ -477,6 +484,7 @@ function updateFocusFlight(dt) {
   $('#focus-layer').style.backdropFilter = '';
   if (t >= 1) {
     const { ball, record, mode } = flight;
+    delete ball.userData.boxFlightMix;
     focusFlight = null;
     $('#focus-layer').classList.remove('ball-in-flight');
     if (mode === 'return') {
@@ -564,7 +572,7 @@ function bindMachinePointer() {
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
     const capture = captureBalls.map((ball) => ball.raycast(raycaster)).filter(Boolean).sort((a, b) => a.distance - b.distance)[0];
-    return machine.raycast(raycaster) || boxInteraction?.raycast(raycaster) || capture;
+    return machine.raycast(raycaster) || boxInteraction?.raycast(raycaster) || signInteraction?.raycast(raycaster) || capture;
   }
   renderer.domElement.addEventListener('pointerdown', (event) => { start = { x: event.clientX, y: event.clientY }; });
   renderer.domElement.addEventListener('pointerup', (event) => {
@@ -573,6 +581,13 @@ function bindMachinePointer() {
     if (result?.action === 'spin') machine.spin();
     if (result?.action === 'collect') startFocusFlight(result.ball);
     if (result?.action === 'box') boxInteraction?.play();
+    if (result?.action === 'sign') signInteraction?.play(sound?.fx);
+    if (result?.action === 'box-prize') {
+      const prize=boxInteraction.claim();
+      if(prize){const ball=instantiateBall(focus.ballTemplate,prize.scale.x);ball.position.copy(prize.position);ball.quaternion.copy(prize.quaternion);scene.add(ball);
+        ball.userData.focusRecord={uid:crypto.randomUUID(),pokemonId:prize.pokemonId,resultIcon:0};
+        startFocusFlight(ball,true);sound?.fx.pickup();}
+    }
     if (result?.action === 'capture-ball') result.target.play();
   });
   renderer.domElement.addEventListener('pointermove', (event) => {
@@ -638,6 +653,7 @@ function frame(dt) {
     dreamscape?.update(dt);
   }
   sound?.update(dt);
+  signInteraction?.update(dt);
   // Prepare only the next uncollected prize while it is still at the outlet.
   const nextPrize = machine?.outputs[machine.outputs.length - 1];
   if (nextPrize && focus && !nextPrize.userData.focusRecord) {

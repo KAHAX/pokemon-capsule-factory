@@ -1,5 +1,19 @@
 import * as THREE from 'three';
 
+const tailBones=new WeakMap();
+export function isTailVertex(mesh,index){
+  if(/tail|sippo/i.test(mesh.name))return true;
+  const skeleton=mesh.skeleton,indices=mesh.geometry.attributes.skinIndex,weights=mesh.geometry.attributes.skinWeight;
+  if(!skeleton||!indices||!weights)return false;
+  if(!tailBones.has(skeleton))tailBones.set(skeleton,skeleton.bones.map(bone=>{
+    for(let p=bone;p?.isBone;p=p.parent)if(/tail|sippo/i.test(p.name))return true;
+    return false;
+  }));
+  const flags=tailBones.get(skeleton);let influence=0;
+  for(let c=0;c<4;c++)if(flags[indices.getComponent(index,c)])influence+=weights.getComponent(index,c);
+  return influence>.2;
+}
+
 // Adaptive extent along one axis. Short appendages (a modest tail, ears, fins) stay part of
 // the silhouette; an extension that reaches out further than ~0.8× the core body (a very
 // long tail, Bulbasaur's vines, streamers) is treated as outside and the body edge is used.
@@ -39,6 +53,7 @@ export function measureModelBounds(root, animation = null, { robust = false } = 
       const positions = object.geometry.attributes.position;
       const stride = Math.max(1, Math.floor(positions.count / 2000));
       for (let i = 0; i < positions.count; i += stride) {
+        if(object.userData.frameWithoutTail&&isTailVertex(object,i))continue;
         object.getVertexPosition(i, point);
         point.applyMatrix4(object.matrixWorld).applyMatrix4(inverse);
         if (Number.isFinite(point.x + point.y + point.z)) {
@@ -130,6 +145,7 @@ export function measureBodyFrame(root, animation = null) {
       const positions = object.geometry.attributes.position;
       const stride = Math.max(1, Math.floor(positions.count / 3000));
       for (let i = 0; i < positions.count; i += stride) {
+        if(object.userData.frameWithoutTail&&isTailVertex(object,i))continue;
         object.getVertexPosition(i, point);
         point.applyMatrix4(object.matrixWorld).applyMatrix4(inverse);
         if (!Number.isFinite(point.x + point.y + point.z)) continue;

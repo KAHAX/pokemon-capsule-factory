@@ -181,7 +181,9 @@ export class MewVisitor {
     this.state = 'arriving';
     this.age = 0;
     this.duration = kind === 'inside' ? random(9, 14) : random(3.4, 4.4) / .75;
+    this.behavior = ['glide','peek','loop'][Math.floor(Math.random()*3)];
     this.route = this.routes[Math.random() < .5 ? 0 : 1];
+    if(kind !== 'inside') this.duration = this.behavior === 'glide' ? 7 : 11;
     this.anchor.copy(kind === 'inside' ? V(.06, 6.65, .1) : this.route.getPointAt(0));
     this.root.position.copy(this.anchor);
     this.route.getTangentAt(0, this.tangent);
@@ -244,11 +246,14 @@ export class MewVisitor {
         this.actor.play(curious ? '20010_defaultidle01' : '20000_defaultwait01', .45, 1, curious);
       } else {
         const u = clamp(this.age / this.duration, 0, 1);
-        const progress = .75 * u + .25 * smooth(u);
+        const progress = this.behavior === 'peek' ? (u < .3 ? u*1.5 : u < .6 ? .45 : .45+(u-.6)*1.375) : .75*u+.25*smooth(u);
         this.route.getPointAt(progress, this.root.position);
         this.route.getTangentAt(progress, this.tangent);
         this.actor.targetYaw = Math.atan2(this.tangent.x, this.tangent.z);
-        this.actor.play('mew_psychic_glide', .35, .8);
+        const pause = this.behavior === 'peek' && u>=.3 && u<.6;
+        this.actor.play(pause ? '20560_notice01' : 'mew_psychic_glide', .35, .8);
+        if(pause){this.root.position.y+=Math.sin(this.age*2)*.15;this.actor.targetYaw+=Math.sin(this.age*2)*.6;}
+        if(this.behavior==='loop'){this.root.position.y+=Math.sin(u*Math.PI*4)*.55;this.root.position.z+=Math.sin(u*Math.PI*2)*.65;}
         // Lean only into actual bends, never add a periodic bob or stroke.
         this.route.getTangentAt(Math.min(1, progress + .035), this.lookTangent);
         const turn = Math.atan2(

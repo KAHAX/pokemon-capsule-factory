@@ -42,12 +42,16 @@ export class PokedexPack {
     this.tiltTarget = new THREE.Vector2();
     this.previewToken = 0;
     this.previewClock = 0;
+    this.previewCache = new Map();
+    this.thumbnailCache = new Map();
+    this.previewPending = new Map();
+    this.previewUse = 0;
     this.onSelect = onSelect;
     this.onViewChange = onViewChange;
     this.scene = new THREE.Scene();
     // The viewer lives around z=-12. A tighter phone depth range separates the
     // closely stacked card faces on WebViews with lower precision depth buffers.
-    this.camera = new THREE.PerspectiveCamera(35, 1, mobileEdition ? 1 : 0.1, mobileEdition ? 50 : 100);
+    this.camera = new THREE.PerspectiveCamera(35, 1, 1, 50);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobilePerformance ? 1 : 1.75));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -153,6 +157,11 @@ export class PokedexPack {
     this.hint = document.createElement('div');
     this.hint.className = 'pokedex-hint';
     document.querySelector('#app').appendChild(this.hint);
+    this.nav = document.createElement('div');
+    this.nav.className = 'pokedex-scroll-nav';this.nav.hidden=true;
+    this.nav.innerHTML = '<button aria-label="上一张卡牌"><svg class="double-chevron" viewBox="0 0 32 36" aria-hidden="true"><path d="m7 15 9-9 9 9 M7 29l9-9 9 9"/></svg></button><svg class="scroll-mouse" viewBox="0 0 24 32" aria-hidden="true"><rect x="5" y="2" width="14" height="27" rx="7"/><path class="scroll-wheel" d="M12 7v6"/></svg>';
+    [...this.nav.querySelectorAll('button')].forEach((b,i)=>b.addEventListener('click',()=>{if(this.cardSwitch)this.queuedCardDirection=i?1:-1;else this.switchCard(i?1:-1);}));
+    document.querySelector('#app').appendChild(this.nav);
     this.bindPointerEvents();
     this.previewHost = document.createElement('div');
     this.previewHost.className = 'pokedex-live-preview';
@@ -272,7 +281,7 @@ export class PokedexPack {
         object.geometry?.dispose();
         const materials = Array.isArray(object.material) ? object.material : [object.material];
         materials.filter(Boolean).forEach((material) => {
-          material.map?.dispose();
+          this.disposeStackTexture(material.map);
           material.dispose();
         });
       });
@@ -282,8 +291,8 @@ export class PokedexPack {
     if (!count) return;
     this.selectedIndex = THREE.MathUtils.clamp(this.selectedIndex, 0, count - 1);
     // Bound GPU work for a large collection while preserving its stack thickness.
-    const visible = Math.min(count, 24);
-    const spacing = .004 + Math.min(count, 100) * .00002;
+    const visible = Math.min(count, 8);
+    const spacing = .034;
     const thickness = .022;
     for (let depth = visible - 1; depth >= 0; depth--) {
       const index = (this.selectedIndex + depth) % count;
@@ -295,36 +304,47 @@ export class PokedexPack {
       group.userData.stackY = step;
       const edge = new THREE.MeshStandardMaterial({ color: '#141921', roughness: 0.62, metalness: 0.05 });
       const body = new THREE.Mesh(roundedCard(3.16, 4.48, .15, thickness), edge);
-      const image = new THREE.TextureLoader().load(card.image);
-      image.colorSpace = THREE.SRGBColorSpace;
-      image.anisotropy = 4;
+      let image=this.thumbnailCache.get(card.image);
+      if(!image){
+        image=new THREE.TextureLoader().load(card.image);image.colorSpace=THREE.SRGBColorSpace;
+        image.anisotropy=4;image.generateMipmaps=false;image.minFilter=THREE.LinearFilter;
+      }
+      this.thumbnailCache.delete(card.image);this.thumbnailCache.set(card.image,image);
       const face = new THREE.Mesh(roundedCard(3.08, 4.40, .12), new THREE.MeshBasicMaterial({ map: image, toneMapped: false }));
-      if (mobileEdition) { face.material.polygonOffset=true;face.material.polygonOffsetFactor=-1;face.material.polygonOffsetUnits=-2; }
-      face.position.z = thickness / 2 + (mobileEdition ? .008 : .002);
+      face.material.polygonOffset=true;face.material.polygonOffsetFactor=-1;face.material.polygonOffsetUnits=-2;
+      face.position.z = thickness / 2 + .008;
       group.add(body, face);
       this.cardStack.add(group);
       if (!depth) { this.selectedFace = face; this.selectedGroup = group; }
     }
     this.previewReady = this.loadLiveCard(this.store.cards[this.selectedIndex]);
+    const used=new Set(this.cardStack.children.flatMap(g=>g.children.map(o=>o.material?.map)));
+    for(const [key,texture] of this.thumbnailCache){
+      if(this.thumbnailCache.size<=16)break;
+      if(used.has(texture))continue;
+      this.thumbnailCache.delete(key);texture.dispose();
+    }
     this.cardStack.visible = this.viewer;
     this.hint.textContent = `滚轮切换 · 拖拽轻转图鉴 · 点击卡牌查看  ${this.selectedIndex + 1} / ${count}`;
   }
 
   switchCard(direction) {
     const count = this.store.cards.length;
-    if (count < 2 || !this.selectedGroup || this.cardSwitch) return;
+    if (!this.viewer || this.transition || this.opening || this.selection || count < 2 || !this.selectedGroup || this.cardSwitch) return;
     const outgoing = this.selectedGroup;
     const oldIndex = this.selectedIndex;
     const start = outgoing.position.clone();
     const widthScale = outgoing.scale.x;
-    // Freeze only the outgoing portrait. Its texture must survive disposal of the old live view.
-    if (this.liveCard && this.liveTexture) {
+    // Freeze the displayed face, including saved thumbnails during fast scrolling.
+    // The departing snapshot must survive cache eviction until its fade completes.
+    const source = this.selectedFace.material.map?.image;
+    if (source?.width && source?.height && source.complete !== false) {
       const canvas = document.createElement('canvas');
-      const source = this.liveCard.captureCanvas();
       canvas.width = source.width; canvas.height = source.height;
       canvas.getContext('2d').drawImage(source, 0, 0);
       const map = new THREE.CanvasTexture(canvas);
       map.colorSpace = THREE.SRGBColorSpace;
+      map.generateMipmaps = false; map.minFilter = THREE.LinearFilter;
       this.selectedFace.material.map = map;
       this.selectedFace.material.needsUpdate = true;
     }
@@ -335,82 +355,130 @@ export class PokedexPack {
     const resting = this.cardStack.children.find(group => group.userData.cardIndex === oldIndex);
     if (resting) resting.visible = false;
     this.cardStack.add(outgoing);
-    this.cardSwitch = {
-      elapsed: 0, outgoing, resting, start, direction,
-      target: resting?.position.clone() || new THREE.Vector3(0, .78, -.03),
-    };
-    // At most one pending step: fast wheel gestures never build up a long animation backlog.
-    this.previewReady.finally(() => { if (this.cardSwitch?.outgoing === outgoing) this.cardSwitch.ready = true; });
+    // The departing face is an opaque snapshot, then gently fades above the
+    // stack. Never move a solid black card body through the incoming face.
+    outgoing.children.forEach(o=>{
+      if(!o.material?.map){o.visible=false;return;}
+      o.material.transparent=true;o.material.depthWrite=false;o.material.depthTest=false;
+      o.renderOrder=100;
+    });
+    this.cardSwitch = { elapsed:0,outgoing,resting,start,direction,incoming:this.selectedGroup,
+      incomingY:this.selectedGroup.position.y };
+    this.selectedGroup.position.y-=.18;
   }
 
   updateCardSwitch(dt) {
-    const state = this.cardSwitch;
-    if (!state) return;
-    state.elapsed += dt;
-    const t = Math.min(1, state.elapsed / .68);
-    const lift = Math.sin(Math.PI * t);
-    state.outgoing.position.lerpVectors(state.start, state.target, smooth(t));
-    state.outgoing.position.y += lift * .80;
-    state.outgoing.position.x += state.direction * lift * .10;
-    state.outgoing.rotation.z = -state.direction * lift * .035;
-    // Move behind the stack at the top of the arc, before settling into its new slot.
-    state.outgoing.position.z = t < .5 ? state.start.z + .06 * lift : state.target.z;
-    if (t === 1 && state.ready) {
-      if (state.resting) state.resting.visible = true;
+    const state=this.cardSwitch;if(!state)return;
+    state.elapsed+=dt;
+    const t=Math.min(1,state.elapsed/.42),eased=smooth(t);
+    state.outgoing.position.copy(state.start);
+    state.outgoing.position.y+=.55*eased;
+    state.outgoing.position.z+=.07;
+    state.outgoing.children.forEach(o=>{if(o.material?.map)o.material.opacity=1-eased;});
+    state.incoming.position.y=state.incomingY-.18*(1-eased);
+    if(t===1){
+      if(state.resting)state.resting.visible=true;
       state.outgoing.removeFromParent();
-      state.outgoing.traverse(object => {
-        object.geometry?.dispose(); object.material?.map?.dispose(); object.material?.dispose();
-      });
-      this.cardSwitch = null;
-      const queued = this.queuedCardDirection; this.queuedCardDirection = 0;
-      if (queued) this.switchCard(queued);
+      state.outgoing.traverse(o=>{o.geometry?.dispose();this.disposeStackTexture(o.material?.map);o.material?.dispose();});
+      this.cardSwitch=null;
+      const queued=this.queuedCardDirection;this.queuedCardDirection=0;
+      if(queued)this.switchCard(queued);
     }
+  }
+
+  disposeStackTexture(texture){
+    if(!texture)return;
+    if([...this.previewCache.values()].some(entry=>entry.texture===texture))return;
+    if([...this.thumbnailCache.values()].includes(texture))return;
+    texture.dispose();
   }
 
   clearLiveCard() {
     this.previewToken++;
-    this.liveCard?.dispose();
-    this.liveCard = null;
-    this.liveTexture?.dispose(); this.liveTexture = null;
-    this.liveModel?.traverse(object => {
-      if (!object.isMesh) return;
-      for (const material of (Array.isArray(object.material) ? object.material : [object.material])) material.dispose();
+    clearTimeout(this.previewWarmTimer);
+    // Cached previews are paused and bounded; switching no longer tears down
+    // and recreates a WebGL context for the same nearby card.
+    this.liveCard=null;this.liveTexture=null;this.liveModel=null;
+  }
+
+  disposePreview(entry){
+    entry.card.dispose();entry.texture.dispose();
+    entry.model.traverse(o=>{
+      if(o.isMesh)for(const m of [].concat(o.material))m.dispose();
+      if(o.isPoints && o.name==='Shiny / floating star glints'){o.geometry.dispose();o.material.dispose();}
     });
-    this.liveModel = null;
+  }
+
+  trimPreviewCache(keep){
+    const limit=mobileEdition?2:3;
+    const entries=[...this.previewCache.entries()].sort((a,b)=>a[1].used-b[1].used);
+    for(const [key,entry] of entries){
+      if(this.previewCache.size<=limit)break;
+      if(entry===keep || entry.card===this.liveCard)continue;
+      this.previewCache.delete(key);this.disposePreview(entry);
+    }
+  }
+
+  async preparePreview(card){
+    const key=String(card.pokemonId);
+    if(this.previewCache.has(key))return this.previewCache.get(key);
+    if(this.previewPending.has(key))return this.previewPending.get(key);
+    const job=(async()=>{
+      const loaded=await this.library.instantiate(card.pokemonId);
+      const releaseModel=()=>loaded.model.traverse(o=>{if(o.isMesh)for(const m of [].concat(o.material))m.dispose();});
+      // Expensive first-time setup happens after the card slide, while the saved
+      // thumbnail is already visible. Fast scrolling skips intermediate models.
+      while(this.viewer && (this.cardSwitch||this.transition||this.opening||this.previewBuilding))await new Promise(r=>setTimeout(r,40));
+      const current=String(this.store.cards[this.selectedIndex]?.pokemonId);
+      const next=String(this.store.cards[(this.selectedIndex+1)%this.store.cards.length]?.pokemonId);
+      if(!this.viewer || (key!==current&&key!==next) || (this.selection&&key!==current)){releaseModel();return null;}
+      this.previewBuilding=true;
+      let live;
+      try{
+        live=new HoloCard(this.previewHost,loaded.entry,loaded.model,loaded.model.userData.cardAnimation||loaded.animation,{manualPreview:true});
+        live.setEntrance(1);live.scene.renderer.setPixelRatio(1);live.scene.resize();
+        await live.surfaceReady;
+        await live.scene.renderer.compileAsync(live.scene.scene,live.scene.camera);
+        if(!this.viewer){live.dispose();releaseModel();return null;}
+        const texture=new THREE.CanvasTexture(live.captureCanvas({preview:true}));
+        texture.colorSpace=THREE.SRGBColorSpace;texture.minFilter=THREE.LinearFilter;texture.generateMipmaps=false;
+        texture.anisotropy=Math.min(4,this.renderer.capabilities.getMaxAnisotropy());
+        const entry={card:live,model:loaded.model,texture,used:++this.previewUse};
+        this.previewCache.set(key,entry);this.trimPreviewCache(entry);return entry;
+      }catch(error){live?.dispose();releaseModel();throw error;}
+      finally{this.previewBuilding=false;}
+    })();
+    this.previewPending.set(key,job);
+    try{return await job;}finally{this.previewPending.delete(key);}
   }
 
   async loadLiveCard(card) {
-    const token = this.previewToken;
-    try {
-      const loaded = await this.library.instantiate(card.pokemonId);
-      if (token !== this.previewToken || !this.viewer) {
-        loaded.model.traverse(o => { if (o.isMesh) for (const m of (Array.isArray(o.material) ? o.material : [o.material])) m.dispose(); });
-        return;
-      }
-      this.liveModel = loaded.model;
-      this.liveCard = new HoloCard(this.previewHost, loaded.entry, loaded.model, loaded.model.userData.cardAnimation || loaded.animation, { manualPreview: mobileEdition });
-      this.liveCard.setEntrance(1);
-      this.liveCard.scene.renderer.setPixelRatio(1);
-      this.liveCard.scene.resize();
-      await this.liveCard.surfaceReady;
-      if (token !== this.previewToken || !this.viewer) return;
-      const ratio = this.liveCard.cardElement.offsetWidth / this.liveCard.cardElement.offsetHeight;
-      this.cardStack.children.forEach(group => { group.scale.x = 4.48 * ratio / 3.16; });
-      this.liveTexture = new THREE.CanvasTexture(this.liveCard.captureCanvas({preview:true}));
-      this.liveTexture.colorSpace = THREE.SRGBColorSpace;
-      this.liveTexture.minFilter = THREE.LinearFilter;
-      this.liveTexture.generateMipmaps = false;
-      this.liveTexture.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
-      this.selectedFace.material.map?.dispose();
-      this.selectedFace.material.map = this.liveTexture;
-      this.selectedFace.material.needsUpdate = true;
-    } catch (error) { console.warn('图鉴动态卡牌暂不可用', error); }
+    const token=this.previewToken;
+    try{
+      const entry=await this.preparePreview(card);
+      if(!entry||token!==this.previewToken||!this.viewer)return;
+      this.liveCard=entry.card;this.liveModel=entry.model;this.liveTexture=entry.texture;entry.used=++this.previewUse;
+      this.previewClock=0;
+      const ratio=this.liveCard.cardElement.offsetWidth/this.liveCard.cardElement.offsetHeight;
+      this.cardStack.children.forEach(group=>{group.scale.x=4.48*ratio/3.16;});
+      this.disposeStackTexture(this.selectedFace.material.map);
+      this.selectedFace.material.map=this.liveTexture;
+      this.selectedFace.material.needsUpdate=true;
+      this.trimPreviewCache(entry);
+      clearTimeout(this.previewWarmTimer);
+      this.previewWarmTimer=setTimeout(()=>{
+        if(!this.viewer||this.selection||this.cardSwitch||token!==this.previewToken)return;
+        const next=this.store.cards[(this.selectedIndex+1)%this.store.cards.length];
+        if(next)this.preparePreview(next).catch(error=>console.warn('图鉴相邻卡牌预热失败',error));
+      },700);
+    }catch(error){console.warn('图鉴动态卡牌暂不可用',error);}
   }
 
   openViewer() {
     if (this.viewer || this.transition || this.opening || this.receiving) return;
     this.receiving = null;
     this.viewer = true;
+    this.nav.hidden = true;
     this.cardDetached = false;
     this.cardReveal = null;
     this.cardStack.scale.setScalar(.0001);
@@ -439,7 +507,7 @@ export class PokedexPack {
   }
 
   async selectCard() {
-    if (this.selection || this.preparing) return;
+    if (this.selection || this.preparing || this.cardSwitch) return;
     this.selection = { phase: 'preparing', elapsed: 0 };
     this.closeButton.classList.remove('visible'); this.hint.classList.remove('visible');
     this.tiltTarget.set(0, 0);
@@ -478,8 +546,11 @@ export class PokedexPack {
       this.selectedGroup.quaternion.slerpQuaternions(state.rotation, new THREE.Quaternion(), t);
       if (t >= 1) {
         // Hand over the same live card, preserving its model animation and avoiding a reload.
-        const prepared = this.liveCard; this.liveCard = null; this.liveModel = null;
-        if (mobileEdition) prepared.scene.setExternalDriving(false);
+        const prepared = this.liveCard;
+        this.previewCache.delete(String(state.saved.pokemonId));
+        clearTimeout(this.previewWarmTimer);
+        this.liveCard = null; this.liveModel = null;
+        prepared.scene.setExternalDriving(false);
         this.selectedGroup.removeFromParent();
         this.selectedGroup.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
         this.liveTexture?.dispose(); this.liveTexture = null;
@@ -507,7 +578,7 @@ export class PokedexPack {
     const tiltDamping = this.pointerStart ? 12 : 6;
     this.tilt.lerp(this.tiltTarget, 1 - Math.exp(-tiltDamping * Math.min(dt, .05)));
     if (!this.pointerStart && this.tilt.lengthSq() < 1e-8) this.tilt.set(0, 0);
-    if (this.liveCard && this.liveTexture && (this.cardStack.visible || this.cardDetached)) {
+    if (this.liveCard && this.liveTexture && !this.cardSwitch && (this.cardStack.visible || this.cardDetached)) {
       this.liveCard.scene.target.set(this.tilt.y * 1.5, -this.tilt.x * 1.5);
       this.previewClock += dt;
       if (this.previewClock >= 1 / (mobileEdition ? 15 : 20)) {
@@ -573,6 +644,20 @@ export class PokedexPack {
       }
     }
     this.updatePose();
+    // Loading a newly collected card precedes the fly-in. Keep the hint hidden
+    // until the entire opening/reveal finishes, then anchor it in the same frame.
+    this.nav.hidden = !this.viewer || !!this.preparing || !!this.receiving
+      || !!this.selection || !!this.transition || !!this.opening || !!this.cardReveal
+      || this.openAmount < .98 || !this.cardStack.visible || !this.store.cards.length
+      || !this.selectedFace;
+    if(!this.nav.hidden){
+      // Follow the left edge of the actual card, not the viewport edge.
+      this.selectedFace.updateWorldMatrix(true,false);
+      const point=new THREE.Vector3(-1.54,0,0).applyMatrix4(this.selectedFace.matrixWorld).project(this.camera);
+      const rect=this.renderer.domElement.getBoundingClientRect();
+      this.nav.style.left=`${Math.max(22,rect.left+(point.x+1)*rect.width/2-30)}px`;
+      this.nav.style.top=`${rect.top+(1-point.y)*rect.height/2}px`;
+    }
     this.dockRenderTime = (this.dockRenderTime || 0) + dt;
     if (!mobilePerformance || !dockIdle || (mobileEdition && !this.mobileDockCached) || this.dockHover !== hoverTarget || this.dockRenderTime >= 1 / 12 || this.forceDockRender) {
       this.renderer.render(this.scene, this.camera);

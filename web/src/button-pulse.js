@@ -10,14 +10,12 @@ const OPENING_PULSES = [
 
 export function openingPulseAt(time) {
   if (time < 0 || time >= BUTTON_PULSE_DURATION) return 0;
-  // Brightening accelerates from dark; dimming starts fast and slows to dark.
-  // Cubic ease-in / ease-out keeps the light continuous at each peak.
+  // Smooth luminous pulses with a soft peak and no abrupt bright-to-dark jump.
   for (const pulse of OPENING_PULSES) {
     const phase = time - pulse.start;
     if (phase < 0 || phase >= pulse.rise + pulse.fall) continue;
-    const envelope = phase < pulse.rise
-      ? Math.pow(phase / pulse.rise, 3)
-      : Math.pow(1 - (phase - pulse.rise) / pulse.fall, 3);
+    const progress = phase < pulse.rise ? phase / pulse.rise : 1 - (phase - pulse.rise) / pulse.fall;
+    const envelope = progress * progress * (3 - 2 * progress);
     return pulse.strength * envelope;
   }
   return 0;
@@ -39,7 +37,7 @@ export class ButtonPulse {
         changed = true;
         const clone = material.clone();
         clone.userData.emissionPass = this.emissionPass;
-        clone.customProgramCacheKey = () => 'observation-button-pulse-v1';
+        clone.customProgramCacheKey = () => 'observation-button-pulse-v2';
         clone.onBeforeCompile = shader => {
           shader.uniforms.buttonPulse = this.power;
           shader.uniforms.buttonTint = this.tint;

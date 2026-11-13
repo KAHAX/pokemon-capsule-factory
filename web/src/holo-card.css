@@ -85,3 +85,8 @@
 .holo-card-back i:after{content:"";position:absolute;left:36%;top:36%;width:28%;height:28%;border:5px solid #11233e;border-radius:50%;background:#fff0ba}
 
 .holo-card-back{backface-visibility:visible}
+
+/* Preserve the model colors beneath the holographic card finish. */
+.holo-card-host .is-shiny .shiny-flow{opacity:.18}
+.holo-card-host .is-shiny .viewport-sheen{opacity:.25}
+.holo-card-host .is-shiny .card-glare{opacity:.28}

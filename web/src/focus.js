@@ -46,6 +46,12 @@ export class PokemonLibrary {
     }
     const gltf = await this.cache.get(entry.id);
     const source = cloneSkeleton(gltf.scene);
+    const bodyOnly=['480','481','482'].includes(String(entry.dex||entry.id).replace('-shiny','').padStart(3,'0'));
+    if(bodyOnly)source.traverse(o=>{if(o.isMesh)o.userData.frameWithoutTail=true;});
+    // The curled-up alternative is not part of the standing/interaction poses.
+    if (String(entry.dex || entry.id).replace('-shiny','').padStart(3,'0') === '027') {
+      const alternate=[];source.traverse(o=>{if(o.isMesh && /_roll_mesh/i.test(o.name))alternate.push(o);});alternate.forEach(o=>o.removeFromParent());
+    }
     const materials = new Map();
     source.traverse((object) => {
       if (!object.isMesh) return;
@@ -751,19 +757,18 @@ export class FocusExperience {
 
   updateCardEntrance() {
     const time = this.modeTime;
-    if (time >= .85 && time < 2.35) this.setHint('精灵球已合拢 · 能量凝聚中…');
-    else if (time >= 2.35 && time < 3.55) this.setHint('星光汇聚 · 正在封装卡牌…');
-    else if (time >= 3.55) this.setHint('开启收藏卡牌…');
+    if (time >= 0.83 && time < 2.03) this.setHint('星光汇聚 · 正在封装卡牌…');
+    else if (time >= 2.03) this.setHint('开启收藏卡牌…');
     if (!this.card && this.pokemon) {
       const target = this.pokemon.userData.displayScale;
       const shrink = 1 - THREE.MathUtils.smoothstep(time / 0.68, 0, 1);
       this.pokemon.scale.setScalar(target * Math.max(0.001, shrink));
     }
-    if (time >= 3.55 && !this.cardLidOpened) {
+    if (time >= 2.03 && !this.cardLidOpened) {
       this.cardLidOpened = true;
       this.playBallSegment(1, 32, 1);
     }
-    if (time >= 4.05 && !this.card) {
+    if (time >= 2.53 && !this.card) {
       // Start inside the open lower shell, following the current ball pose.
       const projected = this.ball.localToWorld(new THREE.Vector3(0, -.12, 0)).project(this.camera);
       this.cardStartScreen = {
@@ -775,13 +780,13 @@ export class FocusExperience {
       document.querySelector('#focus-layer').style.pointerEvents = 'auto';
       document.querySelector('#focus-stage').style.pointerEvents = 'none';
     }
-    if (this.card) this.card.setEntrance(Math.min(1, (time - 4.05) / 2.4), this.cardStartScreen);
-    if (time >= 4.5) {
-      const fall = Math.min(1, (time - 4.5) / 0.42);
+    if (this.card) this.card.setEntrance(Math.min(1, (time - 2.53) / 2.4), this.cardStartScreen);
+    if (time >= 2.98) {
+      const fall = Math.min(1, (time - 2.98) / 0.42);
       this.group.position.y = this.cardBallStartY - 4.2 * fall * fall;
       if (fall >= 1) this.ball.visible = false;
     }
-    if (time >= 6.45) {
+    if (time >= 4.93) {
       this.ball.visible = false;
       this.activateCard();
       this.setEntryTitle(this.pokemonEntry);
@@ -901,9 +906,9 @@ export class FocusExperience {
       let gather = -1;
       if (this.mode === 'closing' && this.modeTime >= 1.4) glow = 1;
       if (this.mode === 'card-opening') {
-        if (this.modeTime >= .83 && this.modeTime < 3.55) glow = 1.1;
-        if (this.modeTime >= 2.35 && this.modeTime <= 3.55) {
-          gather = (this.modeTime - 2.35) / 1.2; glow = 1.4;
+        if (this.modeTime >= .83 && this.modeTime < 2.03) glow = 1.1;
+        if (this.modeTime >= 0.83 && this.modeTime <= 2.03) {
+          gather = (this.modeTime - 0.83) / 1.2; glow = 1.4;
         }
       }
       this.seamAura.update(dt, glow, this.effectTime, gather);
@@ -911,7 +916,7 @@ export class FocusExperience {
     if (!this.card) this.pokemonMixer?.update(dt);
     // A mobile card owns its effect clock after adopting the model. Mixing the
     // observation clock into the same uniforms makes its aurora jump each frame.
-    if (!mobileEdition || !this.card) this.pokemon?.userData.updateEffects?.(this.effectTime);
+    if (!this.card) this.pokemon?.userData.updateEffects?.(this.effectTime);
     if (this.minimizeState) {
       const state = this.minimizeState;
       state.elapsed += Math.min(dt, 1 / 30);
@@ -1004,6 +1009,23 @@ export class FocusExperience {
     this.overlayCamera.layers.set(1);
     const background = this.scene.background;
     const environment = this.scene.environment;
+    const flightMix=ball.userData.boxFlightMix;
+    const lights=[];
+    const surfaces=[];
+    const exposure=this.overlayRenderer.toneMappingExposure;
+    if(flightMix!==undefined){
+      // Ease into close-up illumination using existing lights. Changing the
+      // light count here would compile new shaders during the flight.
+      this.focusLighting.traverse(light=>{
+        if(!light.isLight)return;
+        lights.push([light,light.intensity,light.layers.mask]);light.intensity*=.32+.68*flightMix;
+      });
+      const seen=new Set();
+      ball.traverse(o=>{if(o.isMesh)for(const m of [].concat(o.material))if(!seen.has(m)&&m.envMapIntensity!==undefined){
+        seen.add(m);surfaces.push([m,m.envMapIntensity]);m.envMapIntensity=THREE.MathUtils.lerp(.6,m.envMapIntensity,flightMix);
+      }});
+      this.overlayRenderer.toneMappingExposure=exposure*(.78+.22*flightMix);
+    }
     this.scene.background = null;
     this.scene.environment = this.overlayEnvironment;
     try {
@@ -1011,6 +1033,9 @@ export class FocusExperience {
         glow: true, outlineStrength, rainbow: this.library.entry(record?.pokemonId)?.shiny === true, time: this.effectTime || 0,
       });
     } finally {
+      for(const [light,intensity,mask] of lights){light.intensity=intensity;light.layers.mask=mask;}
+      for(const [material,intensity] of surfaces)material.envMapIntensity=intensity;
+      this.overlayRenderer.toneMappingExposure=exposure;
       this.scene.background = background;
       this.scene.environment = environment;
     }

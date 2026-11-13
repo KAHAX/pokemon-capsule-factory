@@ -33,6 +33,8 @@ function finishBall(ball) {
       if (!rule && !isLiner) return material;
       // Clone shared template materials so factory balls keep their own look.
       const target = material.userData.showcaseOwned ? material : material.clone();
+      target.onBeforeCompile = material.onBeforeCompile;
+      target.customProgramCacheKey = material.customProgramCacheKey;
       target.userData = { ...material.userData, showcaseFinish: true, showcaseOwned: true };
       if (rule) for (const [key, value] of Object.entries(rule[1])) if (key in target) target[key] = value;
       if (isLiner) {
@@ -139,7 +141,7 @@ function openTarget(focus) {
   switch (focus.mode) {
     case 'opening': return THREE.MathUtils.smoothstep(t, .15, .75);
     case 'revealed': return 1;
-    case 'card-opening': return t >= 3.55 && t < 4.3 ? .8 : 0;
+    case 'card-opening': return t >= 2.03 && t < 2.78 ? .8 : 0;
     default: return 0;
   }
 }

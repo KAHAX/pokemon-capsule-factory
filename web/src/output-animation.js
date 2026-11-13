@@ -35,11 +35,19 @@ export class OutputAnimator {
     // Each of the three baked takes has a different hidden lead-in. Derive the
     // cues from the actual path through the curtain instead of a fixed timer.
     const track = clip.tracks.find(track => track.name.endsWith('.position'));
+    // Takes 2 and 3 contain long stationary lead-ins from the original bake.
+    // Begin immediately before the first falling motion, retaining the path.
+    let startTime=0;
+    if(track)for(let i=1;i<track.times.length;i++){
+      const distance=Math.hypot(...[0,1,2].map(k=>track.values[i*3+k]-track.values[k]));
+      if(distance>.003){startTime=track.times[Math.max(0,i-1)];break;}
+    }
+    action.time=startTime;mixer.update(0);
     const crossing = z => {
       if (!track) return 0;
       for (let i = 1; i < track.times.length; i++) {
         const a = track.values[(i-1)*3+2], b = track.values[i*3+2];
-        if (a < z && b >= z) return THREE.MathUtils.lerp(track.times[i-1],track.times[i],(z-a)/(b-a))/action.timeScale;
+        if (a < z && b >= z) return Math.max(0,(THREE.MathUtils.lerp(track.times[i-1],track.times[i],(z-a)/(b-a))-startTime)/action.timeScale);
       }
       return 0;
     };

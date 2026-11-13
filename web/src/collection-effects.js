@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { addShinySparkles } from './shiny-sparkles.js';
 
 const textureCache = new Map();
 const textureLoader = new THREE.TextureLoader();
@@ -31,6 +32,7 @@ uniform float v5Time, v5Phase, v5Density, v5Strength, v5StarEnergy, v5Coverage, 
 uniform sampler2D v5Random, v5Noise;
 varying vec3 v5Coord;
 varying vec3 v5WorldNormal;
+varying vec3 v5ViewNormal,v5ViewPosition;
 float v5Smooth(float a,float b,float x){float t=clamp((x-a)/(b-a),0.0,1.0);return t*t*(3.0-2.0*t);}
 vec3 v5Palette(float t){
   vec3 a=vec3(.65,.25,.43),b=vec3(.32,.24,.67),c=vec3(.17,.55,.64),d=vec3(.66,.55,.26);
@@ -48,7 +50,7 @@ float v5NoiseAt(vec3 p){
 }
 void v5Surface(inout vec3 base,out vec3 glow){
   float phase=fract(v5Time/8.0)+v5Phase;
-  float moving=1.7*v5Coord.z+.65*v5Coord.x+.24*v5NoiseAt(v5Coord)-phase;
+  float moving=1.7*v5Coord.z+.65*v5Coord.x+.24*v5NoiseAt(v5Coord)-v5Time*.22-v5Phase;
   vec3 color=v5Palette(fract(moving));
   float protect=clamp((dot(base,vec3(.2126,.7152,.0722))-.012)/(.07-.012),0.0,1.0);
   vec2 q=v5Coord.xz*v5Density-phase*vec2(8.0,12.0);
@@ -65,9 +67,15 @@ void v5Surface(inout vec3 base,out vec3 glow){
   float front=v5Smooth(.22,.62,abs(normalize(v5WorldNormal).y));
   float mask=outline*front*(1.0-step(.62,rnd2.y))*v5Coverage*protect;
   vec3 star=mix(color,vec3(1.0,.92,.8),.42);
-  base=mix(mix(base,color,protect*v5Strength),star,mask*.2);
-  float wave=pow(.5+.5*sin(moving*12.56637061436),3.0);
-  glow=color*protect*(.65+1.25*wave)+star*mask*v5StarEnergy;
+  float facing=clamp(1.-abs(dot(normalize(v5ViewNormal),normalize(v5ViewPosition))),0.,1.);
+  float fresnel=pow(v5Smooth(.03,.82,facing),1.1);
+  float wave=pow(.5+.5*sin(moving*12.56637061436),2.0);
+  vec3 flowColor=.1+.9*(.5+.5*cos(6.2831853*(moving+vec3(0.,.333333,.666667))));
+  float flow=clamp(protect*v5Strength*(.025+1.2*fresnel),0.,.88);
+  base=mix(mix(base,flowColor,flow),star,mask*.08);
+  // A visible travelling ribbon on the curved rim, fading to essentially zero
+  // on the front-facing body. Its emission is separate from the star patterns.
+  glow=flowColor*protect*v5Strength*(.008+fresnel*(.35+.9*wave))+star*mask*v5StarEnergy*.85;
 }
 `;
 
@@ -96,16 +104,18 @@ async function prepareShiny(root) {
     };
     material.userData.v5Uniforms = uniforms;
     material.userData.emissionPass = emissionPass;
-    material.customProgramCacheKey = () => 'pokemon-shiny-v5-1';
+    material.customProgramCacheKey = () => 'pokemon-shiny-v5-fresnel-3';
     material.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, uniforms);
-      shader.vertexShader = `uniform mat4 v5ToSurface; uniform mat3 v5NormalToSurface; varying vec3 v5Coord; varying vec3 v5WorldNormal;\n${shader.vertexShader}`;
+      shader.vertexShader = `uniform mat4 v5ToSurface; uniform mat3 v5NormalToSurface; varying vec3 v5Coord; varying vec3 v5WorldNormal;varying vec3 v5ViewNormal,v5ViewPosition;\n${shader.vertexShader}`;
       shader.vertexShader = shader.vertexShader.replace('#include <project_vertex>', `
         vec3 v5YUp=(v5ToSurface*vec4(transformed,1.0)).xyz;
         v5Coord=vec3(v5YUp.x,-v5YUp.z,v5YUp.y);
         vec3 v5N=v5NormalToSurface*objectNormal;
         v5WorldNormal=vec3(v5N.x,-v5N.z,v5N.y);
         #include <project_vertex>
+        v5ViewPosition=-mvPosition.xyz;
+        v5ViewNormal=transformedNormal;
       `);
       shader.fragmentShader = SHINY_SHADER + shader.fragmentShader;
       shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', `
@@ -188,7 +198,7 @@ async function prepareFire(root, id) {
 
 export async function applyCollectionEffects(root, entry) {
   const updates = [];
-  if (entry.shiny) updates.push(await prepareShiny(root));
+  if (entry.shiny) { updates.push(await prepareShiny(root)); updates.push(addShinySparkles(root)); }
   updates.push(await prepareFire(root, entry.id));
   return (time) => updates.forEach((update) => update(time));
 }

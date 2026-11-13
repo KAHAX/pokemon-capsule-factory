@@ -181,6 +181,17 @@ export class SoundFX {
     this.music.play().catch(() => {});
   }
 
+  signBuzz(cues=[]) {
+    if(!this.ready('signBuzz',1.3))return;
+    for(const [i,cue] of cues.entries()){
+      const at=cue.at,dur=cue.duration;
+      this.noise({at,dur:dur+.018,gain:.065,type:'bandpass',freq:2300+(i%3)*470,q:1.1,attack:.001,wet:.06});
+      this.tone({at,type:'sawtooth',freq:110,to:65,dur:dur+.025,gain:.018,attack:.001,wet:.02,filter:{freq:1100}});
+      // The restrike clicks exactly when the neon returns, rather than ticking
+      // at a regular musical interval unrelated to the visible fault.
+      this.noise({at:at+dur,dur:.012,gain:.038,type:'highpass',freq:3200,attack:.001,wet:.025});
+    }
+  }
   // ---------- effects ----------
   ui() { if (!this.ready('ui', .04)) return; this.tone({ type: 'square', freq: 1320, to: 1760, dur: .06, gain: .045, wet: .05, filter: { freq: 3200 } }); }
   hover() { if (!this.ready('hover', .08)) return; this.tone({ type: 'triangle', freq: 2093, dur: .035, gain: .02, wet: .05 }); }
