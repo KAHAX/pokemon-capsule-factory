@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "predev": "node scripts/build-mobile-edition.mjs --dev",
+    "build": "vite build && node scripts/build-mobile-edition.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "sync": "node scripts/sync-collection.mjs"
   },
