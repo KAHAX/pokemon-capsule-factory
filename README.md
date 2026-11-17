@@ -1,52 +1,94 @@
-# Pokémon Capsule Works
+# 宝可梦扭蛋机 · Pokémon Capsule Works
 
-宝可梦扭蛋机的独立网站发布副本，保留场景、模型、音乐与交互。
+可交互的 3D 宝可梦扭蛋机场景：转动扭蛋机、打开精灵球、旋转观察宝可梦，并收藏成动态卡牌。包含霓虹招牌、场景精灵、问号箱奖励和独立手机入口。
 
-## Cloudflare Pages
+**[在线体验](https://pokemon-capsule-factory.pages.dev/) · [手机入口](https://pokemon-capsule-factory.pages.dev/mobile/) · [分享源码](docs/SHARING.md) · [部署说明](docs/DEPLOYMENT.md)**
 
-- Git repository: `KAHAX/pokemon-capsule-factory`
-- Production branch: `main`
-- Framework preset: `None`
-- Root directory: `web`
-- Build command: `npm run build`
-- Build output directory: `dist`
-- Node.js: 22 (set by `web/.node-version`)
-- No environment variables or custom domain are required.
+## 下载后怎么运行
 
-The site uses relative, same-origin asset URLs and does not require a local server on port 5180 in production. `npm run sync` is a development-only utility, not part of the build.
-
-## Local preview
+安装 **Node.js 22**（包含 npm）。源码 ZIP 解压后，在项目根目录打开终端：
 
 ```sh
 cd web
 npm ci
-npm run dev
+npm run dev -- --port 5174
 ```
 
-## Large models
+打开终端显示的网址，通常为 http://localhost:5174/；手机入口为 http://localhost:5174/mobile/。端口被占用时，以终端显示的地址为准。
 
-The current release uses compressed, content-addressed model chunks listed in `web/src/transfer-manifest.json`. All referenced chunks are published, and the loader reconstructs each model before parsing it. Raw model files remain available below the Pages 25 MiB limit. The unused original `scene-v5.glb`, local backups, and obsolete transfer chunks are excluded from publication.
+Windows 也可以双击根目录的 **start-windows.cmd**：首次安装依赖，随后启动网页并打开浏览器。首次安装需要联网；模型、贴图和音乐已包含在源码中。
 
-Unused Pokémon animation clips have been removed while preserving the clips used by the scene and collection viewer. Earlier audit reports in the repository describe earlier releases.
+**不需要 Blender、API Key、数据库或 localhost:5180。** 不要直接双击 HTML 文件，3D 资源需要通过本地服务加载。
 
-## Current behavior
+有仓库权限时，也可以先克隆：
 
-- `/` preserves the existing edition. Tag `desktop-preserved-20261112` records the complete pre-mobile release.
-- `/mobile/` is an independent phone entry; there is no automatic redirect or replacement of `/`.
-- Mobile keeps the factory, neon bloom, warm projected key light, capsule opening and card collection. Its full original background cast and routes are restored; the default phone camera starts at the nearest allowed distance (20 scene units from the orbit target). It uses Fresnel transparency, hardware depth for distant blur/outlines, a cached static shadow map, and ground reflections updated on camera movement. Internal resolution adapts between 0.6 and 0.95 CSS pixels, targeting 30 FPS rather than guaranteeing device performance.
-- Mobile uses direct scene interaction (tap the crank or the output ball). The CSS loading indicator avoids an extra startup WebGL context, and the docked Pokédex redraws only when needed.
-- Mobile startup models use a separate content-addressed manifest: 17.3 MiB across 33 requests, versus the earlier 26.7 MiB across 103 requests. Model textures are capped at 512 pixels; the sky and Pokédex surface atlas have separate smaller textures. Original model files and the desktop manifest remain unchanged. Prize models still load on demand from the existing collection.
-- `cd web && node scripts/build-mobile-assets.mjs` regenerates the mobile assets. It preserves triangle counts, vertex positions, UV layout, node names and clip selections. Background prop normal/UV precision is packed without quantizing positions: scene setup needs to reposition connected sign vertices. Phone downloads use a 30-second inactivity deadline so progressing slow transfers are not repeatedly restarted.
+```sh
+git clone --depth 1 https://github.com/KAHAX/pokemon-capsule-factory.git
+cd pokemon-capsule-factory
+```
 
-- Pokédex previews update only the active portrait (15 Hz on mobile / 20 Hz on desktop), retain at most two mobile or three desktop previews, and reuse saved thumbnails. Card switches pause portrait capture and use a short snapshot slide/fade. Separated card bodies prevent overlapping faces from competing for depth. Selecting a card hands off its existing preview and resumes its animation loop. The yellow double-chevron hint appears beside the card only after the full opening animation.
-- Expanded mobile cards combine their cached text/frame, live 3D portrait and moving glare into one GPU surface before tilting. Their animation loop is capped at 30 FPS, the card owns the adopted model's effect clock, and the hidden factory simulation pauses while inspecting a card. Landscape resize keeps the card centered and fitted. Desktop cards retain their original renderer/composition. Automated touch/rotation checks use desktop Chrome emulation; they do not establish frame rates on a physical Huawei phone.
+再执行上面的运行命令。
 
-- Wait for the ordinary scene Pokémon and initial rendering before revealing the factory.
-- Default shiny prize probability: 50%; the former saved 10% default is migrated once.
-- Random shiny scene visitors and the shiny Mew replacement are removed. Ordinary Mew behavior and shiny capsule prizes remain in both editions.
+## 目录结构
 
-The original development project is separate from this publication copy. Future edits must be copied or committed here deliberately before redeploying.
+```text
+pokemon-capsule-factory/
+├─ README.md                 阅读入口
+├─ start-windows.cmd         Windows 启动入口
+├─ docs/                     分享、部署、版本说明
+│  └─ reports/               历史优化报告，不参与运行
+├─ scripts/export-source.ps1 导出已提交版本的源码 ZIP
+└─ web/
+   ├─ index.html             电脑版入口
+   ├─ mobile/index.html      独立手机版入口
+   ├─ src/                   场景、交互、卡牌与界面
+   ├─ public/                模型、贴图、音乐、解码器和素材署名
+   ├─ scripts/               资源处理与检查工具
+   ├─ package.json           依赖和命令
+   └─ package-lock.json      固定依赖版本
+```
 
-The November 13 interaction update includes the five-minute mystery-box recharge and lake-guardian reward, synchronized button pulses, sign fault light/sound interaction, earlier capsule output after chamber rotation stops, richer Mew movement, and brighter close-body shiny stars with restrained Fresnel color flow. Lake-guardian framing excludes tails; card collection begins its particle transition immediately after ball closure.
+技术栈：JavaScript ES Modules、Three.js、Vite、Rapier。修改 `web/src` 后，开发服务会重新加载。
 
-Pokémon names and artwork belong to their respective owners. Additional asset attribution is in `web/public/credits`.
+| 想修改的内容 | 主要文件（相对于 web/src） |
+| --- | --- |
+| 页面初始化、场景连接 | `main.js` |
+| 扭蛋机、出球时机 | `machine.js`、`chamber.js`、`output-animation.js` |
+| 精灵球与宝可梦展示 | `focus.js` |
+| 图鉴、卡牌 | `pokedex-pack.js`、`holo-card.js`、`card/` |
+| 闪光效果 | `collection-effects.js`、`shiny-sparkles.js` |
+| 招牌、问号箱交互 | `sign-interaction.js`、`box-interaction.js` |
+| 手机画质 | `mobile-performance.js`、`mobile-rendering.js` |
+
+## 构建与检查
+
+以下命令在 `web` 目录执行：
+
+```sh
+npm run build
+npm run preview -- --port 4173
+```
+
+构建产物为 `web/dist/`，预览地址为 http://localhost:4173/。
+
+```sh
+node scripts/test-card-preview-driving.mjs
+node scripts/test-asset-transfer.mjs
+```
+
+## 资源与常见问题
+
+- 完整源码包含约 **600 MiB 的运行资源**，下载与首次加载需要时间。分享 ZIP 不含依赖目录和 Git 历史。
+- **保留整个 web/public**。模型会使用 `src/transfer-manifest.json` 和 `src/mobile-transfer-manifest.json` 对应的分块，不能只复制 `.glb` 或 `src`。
+- 收藏保存在访问者的浏览器中，不随源码分享；不同浏览器或域名不会自动同步。
+- `/` 是电脑版，`/mobile/` 是独立手机版，不自动跳转。手机表现取决于设备和浏览器。
+- `npm run sync` 仅用于开发者从另一个本地项目导入精灵，普通运行和部署不要执行。新增动画只保留实际用到的动作。
+- 本仓库包含网页运行源码和已导出的资源，**不包含原始 Blender .blend 工程**。
+
+## 分享与素材说明
+
+仓库目前为**私有仓库**，未授权用户无法直接打开 GitHub 链接。可发送完整源码 ZIP，或给指定 GitHub 用户添加协作者权限，详见 [分享指南](docs/SHARING.md)。
+
+宝可梦名称、角色和相关美术属于各自权利人。已有第三方素材署名和许可保存在 [web/public/credits](web/public/credits)。本仓库没有为所有代码与素材统一授予开源许可；分享源码不等于授予第三方素材的商业使用权。
+
+[详细版本说明](docs/VERSION-NOTES.md) · [历史优化报告](docs/reports/)
