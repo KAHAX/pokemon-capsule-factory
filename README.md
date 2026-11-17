@@ -87,9 +87,8 @@ node scripts/test-asset-transfer.mjs
 
 ## 分享与素材说明
 
-仓库目前为**私有仓库**，未授权用户无法直接打开 GitHub 链接。可发送完整源码 ZIP，或给指定 GitHub 用户添加协作者权限，详见 [分享指南](docs/SHARING.md)。
+仓库已**公开**，任何人都可以浏览源码，或点击 **Code → Download ZIP** 下载。也可使用[直接下载链接](https://github.com/KAHAX/pokemon-capsule-factory/archive/refs/heads/main.zip)，详见 [分享指南](docs/SHARING.md)。
 
 宝可梦名称、角色和相关美术属于各自权利人。已有第三方素材署名和许可保存在 [web/public/credits](web/public/credits)。本仓库没有为所有代码与素材统一授予开源许可；分享源码不等于授予第三方素材的商业使用权。
 
 [详细版本说明](docs/VERSION-NOTES.md) · [历史优化报告](docs/reports/)
-
