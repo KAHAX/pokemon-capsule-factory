@@ -13,10 +13,10 @@
 
 源码包包含已提交的代码、模型、贴图、音乐和说明。不包含 Git 历史、依赖目录、构建目录、浏览器收藏或原始 Blender 工程。
 
-在 Git 仓库根目录用 PowerShell 生成新的分享包：
+在 Git 仓库根目录的终端中生成新的分享包：
 
-```powershell
-powershell -NoProfile -File scripts/export-source.ps1
+```sh
+node scripts/export-source.mjs
 ```
 
 输出到 `share/`，同时生成 SHA-256 校验文件。脚本导出 **HEAD 已提交版本**；有未提交改动时会停止，避免发出旧版。ZIP 解压后的副本没有 Git 历史，重新导出需使用 Git 克隆副本。
@@ -32,3 +32,4 @@ powershell -NoProfile -File scripts/export-source.ps1
 ## 可直接转发的说明
 
 > 这是宝可梦扭蛋机网页源码，模型和素材已包含。先安装 Node.js 22，解压后在项目根目录执行 cd web、npm ci、npm run dev，打开终端显示的网址即可。Windows 也可以双击 start-windows.cmd。不需要 Blender、API Key 或额外动画工具。资源约 600 MiB，首次下载和安装需要时间。素材说明见 README。
+

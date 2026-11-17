@@ -37,7 +37,7 @@ pokemon-capsule-factory/
 ├─ start-windows.cmd         Windows 启动入口
 ├─ docs/                     分享、部署、版本说明
 │  └─ reports/               历史优化报告，不参与运行
-├─ scripts/export-source.ps1 导出已提交版本的源码 ZIP
+├─ scripts/export-source.mjs 导出已提交版本的源码 ZIP
 └─ web/
    ├─ index.html             电脑版入口
    ├─ mobile/index.html      独立手机版入口
@@ -92,3 +92,4 @@ node scripts/test-asset-transfer.mjs
 宝可梦名称、角色和相关美术属于各自权利人。已有第三方素材署名和许可保存在 [web/public/credits](web/public/credits)。本仓库没有为所有代码与素材统一授予开源许可；分享源码不等于授予第三方素材的商业使用权。
 
 [详细版本说明](docs/VERSION-NOTES.md) · [历史优化报告](docs/reports/)
+
