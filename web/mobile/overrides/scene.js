@@ -35,7 +35,7 @@ export function createMainScene(container) {
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000); // include the distant Rayquaza patrol
   camera.position.set(15.96, 13.22, 25.48);
   const baseTarget = new THREE.Vector3(0, 6.5, 0);
-  const nearestDistance = mobileEdition ? 17.8 : 20;
+  const nearestDistance = mobileEdition ? 15.4 : 20;
   if (mobileEdition) camera.position.sub(baseTarget).setLength(nearestDistance).add(baseTarget);
   camera.lookAt(baseTarget);
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -52,7 +52,7 @@ export function createMainScene(container) {
   controls.minAzimuthAngle = azimuth - Math.PI / 6;
   controls.maxAzimuthAngle = azimuth + Math.PI / 36;
   controls.minPolarAngle = Math.max(0.2, polar - Math.PI / 36);
-  controls.maxPolarAngle = Math.min(Math.PI - 0.2, polar + Math.PI / 6);
+  controls.maxPolarAngle = Math.min(Math.PI - 0.2, polar + THREE.MathUtils.degToRad(mobileEdition ? 35 : 30));
   controls.update();
 
   const hemi = new THREE.HemisphereLight('#ffe6bd', '#241b25', 1.1);
@@ -198,7 +198,6 @@ export function createMainScene(container) {
   return { scene, camera, renderer, controls, updateCamera, bloom, dreamTime,
     adaptResolution: dt => { if (mobilePerformance && mobileBudget.sample(dt)) {
       resize();
-      if (mobileEdition && mobileBudget.ratio <= .65) scene.userData.reduceGlobeCost?.();
     } },
     prepare: async () => { stylization.prepare(); await renderer.compileAsync(scene, camera); }, needsRender: () => resizePending, render: () => {
     resizePending = false;

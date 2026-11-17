@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { MobileResolutionBudget } from '../mobile-performance.js';
 
 // One composited WebGL surface rotates with the card. The phone compositor no
 // longer has to tilt a WebGL canvas, live text and multiple blend/filter layers.
@@ -13,6 +14,7 @@ export class MobileCardSurface {
       texture.generateMipmaps=false;texture.minFilter=THREE.LinearFilter;return texture;
     };
     const f=surface;
+    this.budget = new MobileResolutionBudget();
     this.frame=raster(f.frame,f.width,f.height);
     this.overlay=raster(f.overlay,f.w+4,f.h+4);
     this.portrait=new THREE.WebGLRenderTarget(Math.max(1,Math.round(f.w*.8)),Math.max(1,Math.round(f.h*.8)),{depthBuffer:false});
@@ -54,10 +56,21 @@ export class MobileCardSurface {
     card.classList.add('mobile-card-composed');this.resize();
     this.onResize=()=>{this.resize();owner.fitModel?.();owner.onMobileSurfaceResize?.();};window.addEventListener('resize',this.onResize);
   }
+  sampleQuality(delta) {
+    if (!this.budget.sample(delta)) return;
+    const scale = Math.min(1.4, this.budget.ratio);
+    this.portrait.setSize(Math.max(1,Math.round(this.surface.w*scale)), Math.max(1,Math.round(this.surface.h*scale)));
+    const texture = this.portrait.texture;
+    texture.magFilter = scale < .8 ? THREE.NearestFilter : THREE.LinearFilter;
+    texture.needsUpdate = true;
+    this.resize();
+  }
   resize(){
     const f=this.surface;
     this.fit=Math.min(1,(innerWidth-36)/f.width,Math.max(160,innerHeight-110)/f.height);
-    this.renderer.setSize(f.width,f.height,false);
+    const scale = Math.min(1.4, this.budget.ratio);
+    this.renderer.setDrawingBufferSize(f.width, f.height, scale);
+    this.renderer.domElement.style.imageRendering = scale < .8 ? 'pixelated' : 'auto';
     this.owner.camera.aspect=f.w/f.h;this.owner.camera.updateProjectionMatrix();
   }
   render(scene,camera,options){

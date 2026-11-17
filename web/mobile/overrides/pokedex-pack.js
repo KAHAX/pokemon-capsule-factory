@@ -1,4 +1,4 @@
-import { mobileEdition, mobilePerformance } from './mobile-performance.js';
+import { mobileEdition, mobilePerformance, MobileResolutionBudget } from './mobile-performance.js';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { findByKey } from './assets.js';
@@ -43,6 +43,7 @@ export class PokedexPack {
     this.previewToken = 0;
     this.previewClock = 0;
     this.previewCache = new Map();
+    this.portraitBudget = mobileEdition ? new MobileResolutionBudget() : null;
     this.thumbnailCache = new Map();
     this.previewPending = new Map();
     this.previewUse = 0;
@@ -444,7 +445,7 @@ export class PokedexPack {
       let live;
       try{
         live=new HoloCard(this.previewHost,loaded.entry,loaded.model,loaded.model.userData.cardAnimation||loaded.animation,{manualPreview:true});
-        live.setEntrance(1);live.scene.renderer.setPixelRatio(1);live.scene.resize();
+        live.setEntrance(1);live.scene.renderer.setPixelRatio(this.portraitBudget?.ratio ?? 1);live.scene.resize();
         await live.surfaceReady;
         await live.scene.renderer.compileAsync(live.scene.scene,live.scene.camera);
         if(!this.viewer){live.dispose();releaseModel();return null;}
@@ -589,6 +590,11 @@ export class PokedexPack {
     if (!this.pointerStart && this.tilt.lengthSq() < 1e-8) this.tilt.set(0, 0);
     if (this.liveCard && this.liveTexture && !this.cardSwitch && (this.cardStack.visible || this.cardDetached)) {
       this.liveCard.scene.target.set(this.tilt.y * 1.5, -this.tilt.x * 1.5);
+      if (this.portraitBudget?.sample(dt)) {
+        this.liveCard.scene.renderer.setPixelRatio(this.portraitBudget.ratio);
+        this.liveCard.scene.resize();
+      }
+      this.liveCard.pixelPortrait = !!this.portraitBudget && this.portraitBudget.ratio < .8;
       this.previewClock += dt;
       if (this.previewClock >= 1 / (mobileEdition ? 15 : 20)) {
         const delta=this.previewClock;this.previewClock = 0;

@@ -252,7 +252,12 @@ export class HoloCard {
       if(this.disposed)return;
       this.cardSurface = surface;
       if(mobileEdition&&!this.scene.externallyDriven)this.enableMobileSurface();
-    }).catch(error => console.warn('卡面缓存准备失败', error));
+    }).catch(error => console.warn('卡面缓存准备失败', error)).then(() => {
+      if (mobileEdition && !this.disposed) {
+        if (!this.scene.mobileSurface) this.scene.renderFrame(0);
+        this.entranceReady = true;
+      }
+    });
   }
 
   enableMobileSurface(){
@@ -338,6 +343,7 @@ export class HoloCard {
       context.setTransform(scale, 0, 0, scale, 0, 0);
       context.drawImage(f.frame, 0, 0, f.width, f.height);
       context.save(); context.beginPath(); context.roundRect(f.x, f.y, f.w, f.h, 4); context.clip();
+      context.imageSmoothingEnabled = !this.pixelPortrait;
       context.drawImage(scene.renderer.domElement, f.x, f.y, f.w, f.h);
       context.restore();
       context.drawImage(f.overlay, f.x - 2, f.y - 2, f.w + 4, f.h + 4);

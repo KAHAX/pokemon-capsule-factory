@@ -208,7 +208,7 @@ export async function applyPrintedGlass(scene) {
     if (!response.ok) throw new Error('Glass pipe centreline unavailable');
     return response.json();
   })]);
-  const print = drawPrint(font);
+  const print = mobileEdition ? null : drawPrint(font);
   const tubePrint = createTubeLettering(route);
   const done = new Set();
   scene.traverse(object => {
@@ -216,7 +216,7 @@ export async function applyPrintedGlass(scene) {
     if ([].concat(object.material).some(material => /Feeder tube glass/i.test(material?.name))) bindTubePrintCoordinates(object, route);
     for (const material of [].concat(object.material)) {
       if (!material || done.has(material) || !(material.transmission > 0)) continue;
-      if (/Optical clear borosilicate/i.test(material.name)) { patchGlobe(material, print); done.add(material); }
+      if (print && /Optical clear borosilicate/i.test(material.name)) { patchGlobe(material, print); done.add(material); }
       else if (/Feeder tube glass/i.test(material.name)) { patchTube(material, tubePrint); done.add(material); }
     }
   });

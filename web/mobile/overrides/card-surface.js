@@ -12,6 +12,11 @@ async function snapshot(element, width, height, { overlay = false } = {}) {
   const copies = [clone, ...clone.querySelectorAll('*')];
   originals.forEach((source, index) => {
     const target = copies[index], computed = getComputedStyle(source);
+    // Skip the 3D canvas and its decorations, composited separately on mobile.
+    if (mobileEdition && source !== element && source.closest('.card-viewport') && !source.matches('.card-viewport')) {
+      target.style.display = 'none';
+      return;
+    }
     for (const prop of computed) target.style.setProperty(prop, computed.getPropertyValue(prop));
     target.style.animation = 'none'; target.style.transition = 'none';
     if (source.tagName.toLowerCase() === 'use') {
@@ -35,11 +40,22 @@ export async function prepareCardSurface(card) {
   const x = viewport.offsetLeft + viewport.clientLeft, y = viewport.offsetTop + viewport.clientTop;
   const w = viewport.clientWidth, h = viewport.clientHeight;
   if (mobileEdition) {
+    // Keep the portrait window transparent even when a browser flattens SVG layers.
+    const overlay = document.createElement('canvas');
+    overlay.width = w + 4;
+    overlay.height = h + 4;
+    const ink = overlay.getContext('2d');
+    const label = viewport.querySelector('.art-label').textContent;
+    ink.font = '8px monospace';
+    ink.fillStyle = 'rgba(5,18,38,.75)';
+    ink.fillRect(12,12,ink.measureText(label).width + 12,16);
+    ink.fillStyle = '#bceeff';
+    ink.fillText(label,18,23);
+    ink.fillStyle = '#fff1a5';
+    ink.font = '26px serif';
+    ink.fillText('✦',w-30,h-8);
     try {
-      const [frame, overlay] = await Promise.all([
-        snapshot(node,width,height),
-        snapshot(viewport,viewport.offsetWidth,viewport.offsetHeight,{overlay:true}),
-      ]);
+      const frame = await snapshot(node,width,height);
       const probe = document.createElement('canvas');
       probe.width = probe.height = 16;
       const ctx = probe.getContext('2d');
@@ -70,7 +86,7 @@ export async function prepareCardSurface(card) {
     ctx.fillStyle = theme.dark;ctx.fillRect(x,height-29,w,18);
     ctx.fillStyle = '#fff';ctx.font = '10px sans-serif';
     ctx.fillText(card.character.number+'   '+(card.entry.shiny?'SHINY':'POKÉMON')+'  ·  COLLECTION',x+5,height-16,w-10);
-    const overlay = document.createElement('canvas');overlay.width=overlay.height=1;
+
     return {frame,overlay,width,height,x,y,w,h};
   }
   const [frame, overlay] = await Promise.all([snapshot(node,width,height),snapshot(viewport,viewport.offsetWidth,viewport.offsetHeight,{overlay:true})]);

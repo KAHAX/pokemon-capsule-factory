@@ -62,12 +62,9 @@ export function useMobileGlass(scene) {
     for (const material of [].concat(object.material)) {
       if (!material?.transmission || seen.has(material)) continue;
       seen.add(material);
-      // Keep the actual printed/transmissive globe until sustained slow
-      // frames cause the adaptive budget to request its lower-cost variant.
-      const opticalGlobe = /Optical clear borosilicate/i.test(material.name);
-      const desktopState = { transmission: material.transmission, transparent: material.transparent,
-        opacity: material.opacity, depthWrite: material.depthWrite, onBeforeCompile: material.onBeforeCompile,
-        customProgramCacheKey: material.customProgramCacheKey };
+      // The reservoir must stay transmissive at every render scale. Blending a
+      // lit white surface over the capsules creates a milky shell on slow frames.
+      if (/Optical clear borosilicate/i.test(material.name)) continue;
       material.userData.mobileGlass = true;
       material.transmission = 0; material.transparent = true;
       material.opacity = 1; material.depthWrite = false;
@@ -87,18 +84,6 @@ export function useMobileGlass(scene) {
           #include <opaque_fragment>`);
       };
       material.customProgramCacheKey = () => key + '/mobile-fresnel-v1';
-      if (opticalGlobe) {
-        const fallback = { transmission: 0, transparent: true, opacity: 1, depthWrite: false,
-          onBeforeCompile: material.onBeforeCompile, customProgramCacheKey: material.customProgramCacheKey };
-        Object.assign(material, desktopState);
-        const reduceOthers = scene.userData.reduceGlobeCost;
-        scene.userData.reduceGlobeCost = () => {
-          reduceOthers?.();
-          Object.assign(material, fallback);
-          material.needsUpdate = true;
-          delete scene.userData.reduceGlobeCost;
-        };
-      }
       material.needsUpdate = true;
     }
   });
